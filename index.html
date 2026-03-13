@@ -136,9 +136,6 @@ const DEMO_DATA = [
   {firstName:"Дмитрий",lastName:"Сидоров",department:"Продажи",jobTitle:"Sales Lead",status:"Active",hireDate:"2022-01-10"},
   {firstName:"Анна",lastName:"Козлова",department:"Разработка",jobTitle:"Frontend Dev",status:"Active",hireDate:"2023-05-20"},
   {firstName:"Сергей",lastName:"Новиков",department:"Маркетинг",jobTitle:"CMO",status:"Active",hireDate:"2019-11-01"},
-  {firstName:"Елена",lastName:"Морозова",department:"Продажи",jobTitle:"Account Exec",status:"Active",hireDate:"2022-08-15"},
-  {firstName:"Павел",lastName:"Волков",department:"Разработка",jobTitle:"Backend Dev",status:"Active",hireDate:"2023-02-01"},
-  {firstName:"Ольга",lastName:"Лебедева",department:"Маркетинг",jobTitle:"Designer",status:"Inactive",hireDate:"2021-07-12"},
 ];
 window.onload = () => {
   const s = localStorage.getItem("bamboo_creds");
@@ -161,29 +158,18 @@ async function connect() {
   show("loading");
   document.getElementById("setupError").classList.add("hidden");
   try {
-    const token = btoa(apiKey+":x");
-    const res = await fetch(`https://api.bamboohr.com/api/gateway.php/${subdomain}/v1/employees/directory`, {
-      headers: { Authorization: "Basic "+token, Accept: "application/json" }
-    });
-    if (!res.ok) throw new Error("HTTP "+res.status);
+    const url = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=employees/directory`;
+    const res = await fetch(url);
     const json = await res.json();
+    if (json.error) throw new Error(json.error);
     if (!json.employees) throw new Error("Нет данных");
     employees = json.employees;
     renderDashboard(false);
-  } catch(e1) {
-    try {
-      const url = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=employees/directory`;
-      const res2 = await fetch(url, {redirect:"follow"});
-      const json2 = await res2.json();
-      if (!json2.employees) throw new Error(JSON.stringify(json2));
-      employees = json2.employees;
-      renderDashboard(false);
-    } catch(e2) {
-      show("setup");
-      const err = document.getElementById("setupError");
-      err.textContent = "⚠️ "+(e2.message||e1.message);
-      err.classList.remove("hidden");
-    }
+  } catch(e) {
+    show("setup");
+    const err = document.getElementById("setupError");
+    err.textContent = "⚠️ " + e.message;
+    err.classList.remove("hidden");
   }
 }
 function loadDemo() { employees = DEMO_DATA; renderDashboard(true); }
