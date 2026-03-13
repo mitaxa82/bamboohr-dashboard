@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>BambooHR Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, sans-serif; background: #030712; color: #fff; min-height: 100vh; }
+  .setup { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+  .card { background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 32px; width: 100%; max-width: 440px; }
+  label { display: block; color: #9ca3af; font-size: 13px; margin-bottom: 6px; margin-top: 16px; }
+  input { width: 100%; background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none; }
+  input:focus { border-color: #6366f1; }
+  .hint { color: #6b7280; font-size: 11px; margin-top: 4px; }
+  .error { background: #450a0a; border: 1px solid #991b1b; border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-size: 13px; color: #fca5a5; }
+  .btn { width: 100%; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; margin-top: 12px; }
+  .btn-primary { background: #4f46e5; color: #fff; }
+  .btn-secondary { background: #1f2937; color: #d1d5db; }
+  .dashboard { display: none; }
+  .header { background: #111827; border-bottom: 1px solid #1f2937; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+  .badge-demo { background: #451a03; color: #fb923c; border: 1px solid #92400e; }
+  .badge-live { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+  .tabs { background: #111827; border-bottom: 1px solid #1f2937; padding: 0 24px; display: flex; }
+  .tab { padding: 14px 16px; font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; color: #9ca3af; background: none; border-top: none; border-left: none; border-right: none; }
+  .tab.active { color: #818cf8; border-bottom-color: #6366f1; }
+  .content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; }
+  .kpi-value { font-size: 32px; font-weight: 700; }
+  .kpi-label { color: #9ca3af; font-size: 13px; margin-top: 4px; }
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .chart-card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; }
+  .chart-card h3 { font-size: 14px; font-weight: 600; color: #d1d5db; margin-bottom: 16px; }
+  .table-card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; overflow: hidden; }
+  .table-header { padding: 16px 20px; border-bottom: 1px solid #1f2937; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 12px 16px; color: #9ca3af; font-size: 12px; background: #0f172a; }
+  td { padding: 12px 16px; border-top: 1px solid #1f2937; font-size: 13px; color: #d1d5db; }
+  tr:hover td { background: #1f2937; }
+  .avatar { width: 32px; height: 32px; background: #312e81; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #a5b4fc; margin-right: 10px; flex-shrink: 0; }
+  .flex { display: flex; align-items: center; }
+  .status { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .status-active { background: #052e16; color: #4ade80; }
+  .status-inactive { background: #1f2937; color: #9ca3af; }
+  .ai-card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .ai-result { background: #111827; border: 1px solid #3730a3; border-radius: 12px; padding: 24px; white-space: pre-wrap; font-size: 14px; line-height: 1.7; color: #e2e8f0; }
+  .btn-ai { background: #4f46e5; color: #fff; padding: 10px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 14px; margin-top: 12px; }
+  .spinner { width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hidden { display: none !important; }
+  .loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 16px; }
+  .big-spinner { width: 48px; height: 48px; border: 4px solid #4f46e5; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+</style>
+</head>
+<body>
+<div id="loading" class="loading-screen hidden">
+  <div class="big-spinner"></div>
+  <p style="color:#9ca3af">Подключение к BambooHR...</p>
+</div>
+<div id="setup" class="setup">
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div style="width:40px;height:40px;background:#4f46e5;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">🎋</div>
+      <div><h1 style="font-size:20px;font-weight:700">BambooHR Dashboard</h1><p style="color:#9ca3af;font-size:13px">HR-аналитика + AI</p></div>
+    </div>
+    <label>Субдомен компании</label>
+    <input id="subdomain" type="text" placeholder="mercuryo">
+    <div class="hint">только название, без .bamboohr.com</div>
+    <label>API-ключ BambooHR</label>
+    <input id="apiKey" type="password" placeholder="••••••••••••••••">
+    <div id="setupError" class="error hidden"></div>
+    <button class="btn btn-primary" onclick="connect()">Подключиться</button>
+    <button class="btn btn-secondary" onclick="loadDemo()">Демо-режим</button>
+  </div>
+</div>
+<div id="dashboard" class="dashboard">
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;background:#4f46e5;border-radius:8px;display:flex;align-items:center;justify-content:center">🎋</div>
+      <strong>BambooHR Analytics</strong>
+      <span class="badge badge-demo hidden" id="badgeDemo">ДЕМО</span>
+      <span class="badge badge-live hidden" id="badgeLive">✓ Подключено</span>
+    </div>
+    <button onclick="showSetup()" style="background:none;border:none;color:#9ca3af;cursor:pointer">⚙️ Настройки</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('overview',this)">📊 Обзор</button>
+    <button class="tab" onclick="showTab('employees',this)">👥 Сотрудники</button>
+    <button class="tab" onclick="showTab('ai',this)">🤖 AI-анализ</button>
+  </div>
+  <div class="content">
+    <div id="tab-overview">
+      <div class="kpi-grid">
+        <div class="kpi"><div style="font-size:22px;margin-bottom:6px">👥</div><div class="kpi-value" id="kpiTotal">0</div><div class="kpi-label">Всего сотрудников</div></div>
+        <div class="kpi"><div style="font-size:22px;margin-bottom:6px">✅</div><div class="kpi-value" id="kpiActive">0</div><div class="kpi-label">Активных</div></div>
+        <div class="kpi"><div style="font-size:22px;margin-bottom:6px">⏸️</div><div class="kpi-value" id="kpiInactive">0</div><div class="kpi-label">Неактивных</div></div>
+        <div class="kpi"><div style="font-size:22px;margin-bottom:6px">🏢</div><div class="kpi-value" id="kpiDepts">0</div><div class="kpi-label">Отделов</div></div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card"><h3>По отделам</h3><canvas id="chartDept"></canvas></div>
+        <div class="chart-card"><h3>Найм по годам</h3><canvas id="chartHire"></canvas></div>
+      </div>
+    </div>
+    <div id="tab-employees" class="hidden">
+      <div class="table-card">
+        <div class="table-header" id="empTitle">Сотрудники</div>
+        <div style="overflow-x:auto">
+          <table><thead><tr><th>Имя</th><th>Отдел</th><th>Должность</th><th>Статус</th><th>Дата найма</th></tr></thead>
+          <tbody id="empTable"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div id="tab-ai" class="hidden">
+      <div class="ai-card">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="width:48px;height:48px;background:#1e1b4b;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🤖</div>
+          <div>
+            <strong style="font-size:16px">AI HR-аналитик</strong>
+            <p style="color:#9ca3af;font-size:13px;margin-top:4px">Claude проанализирует HR-данные и даст рекомендации</p>
+            <button class="btn-ai" id="aiBtn" onclick="runAI()">▶ Запустить анализ</button>
+          </div>
+        </div>
+      </div>
+      <div id="aiResult" class="ai-result hidden"></div>
+    </div>
+  </div>
+</div>
+<script>
+const PROXY = "https://script.google.com/macros/s/AKfycbzpP1q-ZE1FFJP6_GA86zjLHyPlwNNwxNX0ZQ3714vp1mUUpli5LIhBOmNUVEVwNjkh/exec";
+let employees = [], charts = {};
+const DEMO_DATA = [
+  {firstName:"Алексей",lastName:"Иванов",department:"Разработка",jobTitle:"Senior Dev",status:"Active",hireDate:"2021-03-15"},
+  {firstName:"Мария",lastName:"Петрова",department:"HR",jobTitle:"HR Manager",status:"Active",hireDate:"2020-06-01"},
+  {firstName:"Дмитрий",lastName:"Сидоров",department:"Продажи",jobTitle:"Sales Lead",status:"Active",hireDate:"2022-01-10"},
+  {firstName:"Анна",lastName:"Козлова",department:"Разработка",jobTitle:"Frontend Dev",status:"Active",hireDate:"2023-05-20"},
+  {firstName:"Сергей",lastName:"Новиков",department:"Маркетинг",jobTitle:"CMO",status:"Active",hireDate:"2019-11-01"},
+  {firstName:"Елена",lastName:"Морозова",department:"Продажи",jobTitle:"Account Exec",status:"Active",hireDate:"2022-08-15"},
+  {firstName:"Павел",lastName:"Волков",department:"Разработка",jobTitle:"Backend Dev",status:"Active",hireDate:"2023-02-01"},
+  {firstName:"Ольга",lastName:"Лебедева",department:"Маркетинг",jobTitle:"Designer",status:"Inactive",hireDate:"2021-07-12"},
+];
+window.onload = () => {
+  const s = localStorage.getItem("bamboo_creds");
+  if (s) { const c = JSON.parse(s); document.getElementById("subdomain").value = c.subdomain||""; document.getElementById("apiKey").value = c.apiKey||""; }
+};
+function show(s) {
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("setup").classList.add("hidden");
+  document.getElementById("dashboard").style.display = "none";
+  if (s==="loading") document.getElementById("loading").classList.remove("hidden");
+  else if (s==="setup") document.getElementById("setup").classList.remove("hidden");
+  else document.getElementById("dashboard").style.display = "block";
+}
+function showSetup() { show("setup"); }
+async function connect() {
+  const apiKey = document.getElementById("apiKey").value.trim();
+  const subdomain = document.getElementById("subdomain").value.trim();
+  if (!apiKey || !subdomain) return;
+  localStorage.setItem("bamboo_creds", JSON.stringify({apiKey, subdomain}));
+  show("loading");
+  document.getElementById("setupError").classList.add("hidden");
+  try {
+    const token = btoa(apiKey+":x");
+    const res = await fetch(`https://api.bamboohr.com/api/gateway.php/${subdomain}/v1/employees/directory`, {
+      headers: { Authorization: "Basic "+token, Accept: "application/json" }
+    });
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    const json = await res.json();
+    if (!json.employees) throw new Error("Нет данных");
+    employees = json.employees;
+    renderDashboard(false);
+  } catch(e1) {
+    try {
+      const url = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=employees/directory`;
+      const res2 = await fetch(url, {redirect:"follow"});
+      const json2 = await res2.json();
+      if (!json2.employees) throw new Error(JSON.stringify(json2));
+      employees = json2.employees;
+      renderDashboard(false);
+    } catch(e2) {
+      show("setup");
+      const err = document.getElementById("setupError");
+      err.textContent = "⚠️ "+(e2.message||e1.message);
+      err.classList.remove("hidden");
+    }
+  }
+}
+function loadDemo() { employees = DEMO_DATA; renderDashboard(true); }
+function renderDashboard(isDemo) {
+  document.getElementById("badgeDemo").classList.toggle("hidden", !isDemo);
+  document.getElementById("badgeLive").classList.toggle("hidden", isDemo);
+  const active = employees.filter(e=>(e.status||"").toLowerCase().includes("active")).length;
+  const deptMap = {};
+  employees.forEach(e=>{if(e.department) deptMap[e.department]=(deptMap[e.department]||0)+1;});
+  document.getElementById("kpiTotal").textContent = employees.length;
+  document.getElementById("kpiActive").textContent = active;
+  document.getElementById("kpiInactive").textContent = employees.length-active;
+  document.getElementById("kpiDepts").textContent = Object.keys(deptMap).length;
+  if(charts.dept) charts.dept.destroy();
+  if(charts.hire) charts.hire.destroy();
+  charts.dept = new Chart(document.getElementById("chartDept"),{type:"bar",data:{labels:Object.keys(deptMap),datasets:[{data:Object.values(deptMap),backgroundColor:"#6366f199",borderColor:"#6366f1",borderWidth:2,borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#9ca3af"},grid:{color:"#1f2937"}},y:{ticks:{color:"#9ca3af"},grid:{color:"#1f2937"},beginAtZero:true}}}});
+  const hireMap={};
+  employees.forEach(e=>{const y=(e.hireDate||"").slice(0,4);if(y) hireMap[y]=(hireMap[y]||0)+1;});
+  const years=Object.keys(hireMap).sort();
+  charts.hire = new Chart(document.getElementById("chartHire"),{type:"line",data:{labels:years,datasets:[{data:years.map(y=>hireMap[y]),borderColor:"#22d3ee",borderWidth:2,pointBackgroundColor:"#22d3ee",fill:false}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#9ca3af"},grid:{color:"#1f2937"}},y:{ticks:{color:"#9ca3af"},grid:{color:"#1f2937"},beginAtZero:true}}}});
+  document.getElementById("empTitle").textContent=`Сотрудники (${employees.length})`;
+  document.getElementById("empTable").innerHTML=employees.map(e=>`<tr><td><div class="flex"><div class="avatar">${(e.firstName||"")[0]||""}${(e.lastName||"")[0]||""}</div>${e.firstName||""} ${e.lastName||""}</div></td><td>${e.department||"—"}</td><td>${e.jobTitle||"—"}</td><td><span class="status ${(e.status||"").toLowerCase().includes("active")?"status-active":"status-inactive"}">${e.status||"—"}</span></td><td>${e.hireDate||"—"}</td></tr>`).join("");
+  show("dashboard");
+  showTab("overview",document.querySelector(".tab"));
+}
+function showTab(name,btn) {
+  ["overview","employees","ai"].forEach(t=>document.getElementById("tab-"+t).classList.toggle("hidden",t!==name));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+}
+async function runAI() {
+  const btn=document.getElementById("aiBtn"),result=document.getElementById("aiResult");
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Анализирую...';result.classList.add("hidden");
+  const deptMap={};employees.forEach(e=>{if(e.department) deptMap[e.department]=(deptMap[e.department]||0)+1;});
+  try {
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:"Ты HR-аналитик. Отвечай на русском, кратко и конкретно.",messages:[{role:"user",content:`Проанализируй HR-данные:\n${JSON.stringify({total:employees.length,departments:deptMap},null,2)}`}]})});
+    const d=await res.json();
+    result.textContent=d.content?.[0]?.text||"Нет ответа";result.classList.remove("hidden");
+  } catch(e){result.textContent="Ошибка: "+e.message;result.classList.remove("hidden");}
+  btn.disabled=false;btn.innerHTML="▶ Запустить анализ";
+}
+</script>
+</body>
+</html>
