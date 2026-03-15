@@ -6,237 +6,160 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root {
-  --bg: #06070d;
-  --surface: #0d1117;
-  --surface2: #161b22;
-  --border: #21262d;
-  --border2: #30363d;
-  --text: #e6edf3;
-  --muted: #8b949e;
-  --accent: #58a6ff;
-  --accent2: #3d8bcd;
-  --green: #3fb950;
-  --red: #f85149;
-  --orange: #d29922;
-  --purple: #bc8cff;
-  --teal: #39d353;
-  --radius: 10px;
-  --font: 'Space Grotesk', sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
-
-/* ─── SCROLLBAR ─── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--surface); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-/* ─── SETUP ─── */
-.setup { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(ellipse at 50% 0%, #0d2137 0%, var(--bg) 70%); }
-.setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 100%; max-width: 420px; }
-.setup-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
-.setup-logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #1a3a5c, #0d2137); border: 1px solid var(--accent2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-.setup-logo h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
-.setup-logo p { color: var(--muted); font-size: 12px; margin-top: 2px; }
-label { display: block; color: var(--muted); font-size: 12px; font-weight: 500; margin-bottom: 6px; margin-top: 18px; text-transform: uppercase; letter-spacing: 0.5px; }
-input, select { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 14px; font-family: var(--font); outline: none; transition: border-color 0.2s; }
-input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,166,255,.1); }
-input::placeholder { color: var(--muted); }
-.hint { color: var(--muted); font-size: 11px; margin-top: 5px; }
-.error-box { background: rgba(248,81,73,.08); border: 1px solid rgba(248,81,73,.3); border-radius: 8px; padding: 10px 14px; margin-top: 14px; font-size: 13px; color: #f85149; display: none; }
-.btn { width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: var(--font); cursor: pointer; border: none; margin-top: 10px; transition: all 0.15s; }
-.btn-primary { background: var(--accent); color: #000; }
-.btn-primary:hover { background: #79bcff; }
-.btn-ghost { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-.btn-ghost:hover { color: var(--text); border-color: var(--border2); }
-
-/* ─── LOADING ─── */
-.loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 16px; display: none; }
-.pulse-ring { width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--border2); border-top-color: var(--accent); animation: spin .9s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ─── DASHBOARD ─── */
-.dashboard { display: none; min-height: 100vh; }
-.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; }
-.sidebar-logo { padding: 20px 20px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
-.sidebar-logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #1a3a5c, #0d2137); border: 1px solid var(--accent2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
-.sidebar-logo span { font-weight: 700; font-size: 15px; letter-spacing: -0.2px; }
-.sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; color: var(--muted); font-weight: 500; font-size: 13px; transition: all 0.15s; border: none; background: none; width: 100%; text-align: left; }
-.nav-item:hover { color: var(--text); background: var(--surface2); }
-.nav-item.active { color: var(--accent); background: rgba(88,166,255,.1); }
-.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
-.sidebar-footer { padding: 12px 10px; border-top: 1px solid var(--border); }
-.conn-badge { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: var(--surface2); font-size: 12px; }
-.conn-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.conn-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); }
-.conn-dot.demo { background: var(--orange); }
-.main { margin-left: 220px; min-height: 100vh; }
-.topbar { padding: 16px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); position: sticky; top: 0; z-index: 50; }
-.topbar-title { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
-.topbar-sub { color: var(--muted); font-size: 12px; margin-top: 1px; }
-.content { padding: 28px; }
-
-/* ─── TABS ─── */
-.tab-pane { display: none; }
-.tab-pane.active { display: block; animation: fadeUp .2s ease; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ─── KPI GRID ─── */
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 24px; }
-.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; transition: border-color .2s; }
-.kpi-card:hover { border-color: var(--border2); }
-.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--kpi-color, var(--accent)), transparent); }
-.kpi-icon { font-size: 18px; margin-bottom: 10px; }
-.kpi-value { font-size: 30px; font-weight: 700; letter-spacing: -1px; font-family: var(--mono); }
-.kpi-label { color: var(--muted); font-size: 12px; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
-.kpi-trend { font-size: 11px; margin-top: 6px; font-family: var(--mono); }
-.kpi-trend.up { color: var(--green); }
-.kpi-trend.neutral { color: var(--muted); }
-
-/* ─── CHARTS ─── */
-.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-.charts-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.chart-card.full { grid-column: 1 / -1; }
-.chart-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
-
-/* ─── TABLE ─── */
-.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.table-head { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.table-head-title { font-size: 14px; font-weight: 600; }
-table { width: 100%; border-collapse: collapse; }
-th { text-align: left; padding: 10px 16px; color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; background: var(--bg); cursor: pointer; user-select: none; white-space: nowrap; }
-th:hover { color: var(--text); }
-td { padding: 11px 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text); vertical-align: middle; }
-tr:hover td { background: rgba(255,255,255,.02); }
-.avatar { width: 30px; height: 30px; background: linear-gradient(135deg, #1a3a5c, #0a1f35); border: 1px solid var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); margin-right: 10px; flex-shrink: 0; font-family: var(--mono); }
-.flex-row { display: flex; align-items: center; }
-.pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; font-family: var(--mono); }
-.pill-green { background: rgba(63,185,80,.1); color: var(--green); border: 1px solid rgba(63,185,80,.2); }
-.pill-gray { background: rgba(139,148,158,.1); color: var(--muted); border: 1px solid rgba(139,148,158,.15); }
-.pill-orange { background: rgba(210,153,34,.1); color: var(--orange); border: 1px solid rgba(210,153,34,.2); }
-.pill-blue { background: rgba(88,166,255,.1); color: var(--accent); border: 1px solid rgba(88,166,255,.2); }
-.pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-
-/* ─── SEARCH BAR ─── */
-.search-row { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
-.search-row input, .search-row select { flex: 1; min-width: 150px; margin: 0; }
-.search-input-wrap { position: relative; flex: 1.5; min-width: 200px; }
-.search-input-wrap input { padding-left: 36px; }
-.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; pointer-events: none; }
-
-/* ─── ONBOARDING ─── */
-.section-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-.section-label::before { content: ''; width: 3px; height: 14px; border-radius: 2px; background: var(--accent); display: block; }
-.onboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.onboard-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; align-items: center; gap: 12px; transition: border-color .2s; }
-.onboard-card:hover { border-color: var(--border2); }
-.onboard-av { width: 40px; height: 40px; background: linear-gradient(135deg, #1a3a5c, #0a1f35); border: 1px solid var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--accent); flex-shrink: 0; font-family: var(--mono); }
-.onboard-av.off { background: linear-gradient(135deg, #2a1010, #1a0a0a); border-color: rgba(248,81,73,.3); color: var(--red); }
-.onboard-name { font-weight: 600; font-size: 13px; }
-.onboard-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
-
-/* ─── AI CHAT ─── */
-.ai-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; height: calc(100vh - 180px); min-height: 500px; }
-.chat-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; }
-.chat-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-.chat-header-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #1e1b4b, #0d0c2b); border: 1px solid rgba(188,140,255,.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.chat-header-info h3 { font-size: 14px; font-weight: 600; }
-.chat-header-info p { color: var(--muted); font-size: 11px; margin-top: 1px; }
-.chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-.msg { display: flex; gap: 10px; align-items: flex-start; animation: fadeUp .2s ease; }
-.msg.user { flex-direction: row-reverse; }
-.msg-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
-.msg-av.ai { background: linear-gradient(135deg, #1e1b4b, #0d0c2b); border: 1px solid rgba(188,140,255,.3); color: var(--purple); }
-.msg-av.user { background: var(--surface2); border: 1px solid var(--border); color: var(--accent); }
-.msg-bubble { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.6; }
-.msg-bubble.ai { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 12px 12px 12px 3px; }
-.msg-bubble.user { background: rgba(88,166,255,.1); border: 1px solid rgba(88,166,255,.2); color: var(--text); border-radius: 12px 12px 3px 12px; }
-.chat-input-wrap { padding: 14px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
-.chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 13px; font-family: var(--font); outline: none; resize: none; height: 42px; transition: border-color .2s; }
-.chat-input:focus { border-color: var(--accent); }
-.btn-send { background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 0 16px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all .15s; flex-shrink: 0; }
-.btn-send:hover { background: #79bcff; }
-.btn-send:disabled { opacity: .4; cursor: not-allowed; }
-.ai-prompts { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow-y: auto; }
-.ai-prompts h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 12px; }
-.prompt-chip { display: block; width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px; font-size: 12px; color: var(--muted); background: none; border: 1px solid var(--border); cursor: pointer; font-family: var(--font); transition: all .15s; margin-bottom: 6px; line-height: 1.4; }
-.prompt-chip:hover { color: var(--text); border-color: var(--accent); background: rgba(88,166,255,.05); }
-.ai-stats { margin-top: 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
-.ai-stats h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 10px; }
-.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); }
-.stat-row:last-child { border: none; }
-.stat-key { font-size: 11px; color: var(--muted); }
-.stat-val { font-size: 12px; font-weight: 600; font-family: var(--mono); color: var(--text); }
-.typing-dots { display: inline-flex; gap: 3px; padding: 4px 0; }
-.typing-dots span { width: 5px; height: 5px; background: var(--muted); border-radius: 50%; animation: bounce .9s ease infinite; }
-.typing-dots span:nth-child(2) { animation-delay: .15s; }
-.typing-dots span:nth-child(3) { animation-delay: .3s; }
-@keyframes bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
-.empty-chat { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); gap: 10px; }
-.empty-chat-icon { font-size: 36px; opacity: .5; }
-
-/* ─── UTILS ─── */
-.hidden { display: none !important; }
-.mt-16 { margin-top: 16px; }
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.section-gap { margin-bottom: 24px; }
-
-@media (max-width: 1000px) {
-  .sidebar { width: 60px; }
-  .sidebar-logo span, .nav-item span, .sidebar-footer .conn-badge span { display: none; }
-  .main { margin-left: 60px; }
-  .nav-item { justify-content: center; padding: 10px; }
-  .charts-grid, .charts-grid-3 { grid-template-columns: 1fr; }
-  .ai-layout { grid-template-columns: 1fr; }
-  .ai-prompts { display: none; }
-  .two-col { grid-template-columns: 1fr; }
-  .onboard-grid { grid-template-columns: 1fr; }
+:root{--bg:#06070d;--surface:#0d1117;--surface2:#161b22;--border:#21262d;--border2:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--accent2:#3d8bcd;--green:#3fb950;--red:#f85149;--orange:#d29922;--purple:#bc8cff;--teal:#39d353;--radius:10px;--font:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.setup{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse at 50% 0%,#0d2137 0%,var(--bg) 70%)}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;width:100%;max-width:420px}
+.setup-logo{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.setup-logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#1a3a5c,#0d2137);border:1px solid var(--accent2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.setup-logo h1{font-size:20px;font-weight:700;letter-spacing:-.3px}
+.setup-logo p{color:var(--muted);font-size:12px;margin-top:2px}
+label{display:block;color:var(--muted);font-size:12px;font-weight:500;margin-bottom:6px;margin-top:18px;text-transform:uppercase;letter-spacing:.5px}
+input,select{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,.1)}
+input::placeholder{color:var(--muted)}
+.hint{color:var(--muted);font-size:11px;margin-top:5px}
+.error-box{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin-top:14px;font-size:13px;color:#f85149;display:none}
+.btn{width:100%;padding:12px;border-radius:8px;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;border:none;margin-top:10px;transition:all .15s}
+.btn-primary{background:var(--accent);color:#000}.btn-primary:hover{background:#79bcff}
+.btn-ghost{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+.loading-screen{display:none;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px}
+.pulse-ring{width:56px;height:56px;border-radius:50%;border:2px solid var(--border2);border-top-color:var(--accent);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dashboard{display:none;min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.sidebar-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1a3a5c,#0d2137);border:1px solid var(--accent2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.sidebar-logo span{font-weight:700;font-size:15px;letter-spacing:-.2px}
+.sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500;font-size:13px;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{color:var(--text);background:var(--surface2)}
+.nav-item.active{color:var(--accent);background:rgba(88,166,255,.1)}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:12px 10px;border-top:1px solid var(--border)}
+.conn-badge{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:var(--surface2);font-size:12px}
+.conn-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.conn-dot.live{background:var(--green);box-shadow:0 0 6px var(--green)}
+.conn-dot.demo{background:var(--orange)}
+.main{margin-left:220px;min-height:100vh}
+.topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.topbar-sub{color:var(--muted);font-size:12px;margin-top:1px}
+.content{padding:28px}
+.tab-pane{display:none}
+.tab-pane.active{display:block;animation:fadeUp .2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;transition:border-color .2s}
+.kpi-card:hover{border-color:var(--border2)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--kpi-color,var(--accent)),transparent)}
+.kpi-icon{font-size:18px;margin-bottom:10px}
+.kpi-value{font-size:30px;font-weight:700;letter-spacing:-1px;font-family:var(--mono)}
+.kpi-label{color:var(--muted);font-size:12px;margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
+.kpi-trend{font-size:11px;margin-top:6px;font-family:var(--mono);color:var(--muted)}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.chart-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.table-head{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.table-head-title{font-size:14px;font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 16px;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;background:var(--bg);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--text)}
+td{padding:11px 16px;border-top:1px solid var(--border);font-size:13px;color:var(--text);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
+.avatar{width:30px;height:30px;background:linear-gradient(135deg,#1a3a5c,#0a1f35);border:1px solid var(--accent2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);margin-right:10px;flex-shrink:0;font-family:var(--mono)}
+.flex-row{display:flex;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;font-family:var(--mono)}
+.pill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.pill-green{background:rgba(63,185,80,.1);color:var(--green);border:1px solid rgba(63,185,80,.2)}
+.pill-gray{background:rgba(139,148,158,.1);color:var(--muted);border:1px solid rgba(139,148,158,.15)}
+.pill-orange{background:rgba(210,153,34,.1);color:var(--orange);border:1px solid rgba(210,153,34,.2)}
+.search-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.search-row input,.search-row select{flex:1;min-width:150px;margin:0}
+.search-input-wrap{position:relative;flex:1.5;min-width:200px}
+.search-input-wrap input{padding-left:36px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.section-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-label::before{content:'';width:3px;height:14px;border-radius:2px;background:var(--accent);display:block}
+.onboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.onboard-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px}
+.onboard-av{width:40px;height:40px;background:linear-gradient(135deg,#1a3a5c,#0a1f35);border:1px solid var(--accent2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--mono)}
+.onboard-av.off{background:linear-gradient(135deg,#2a1010,#1a0a0a);border-color:rgba(248,81,73,.3);color:var(--red)}
+.onboard-name{font-weight:600;font-size:13px}
+.onboard-sub{color:var(--muted);font-size:11px;margin-top:2px}
+.ai-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;height:calc(100vh - 180px);min-height:500px}
+.chat-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden}
+.chat-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.chat-header-icon{width:36px;height:36px;background:linear-gradient(135deg,#1e1b4b,#0d0c2b);border:1px solid rgba(188,140,255,.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.chat-header-info h3{font-size:14px;font-weight:600}
+.chat-header-info p{color:var(--muted);font-size:11px;margin-top:1px}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:10px;align-items:flex-start;animation:fadeUp .2s ease}
+.msg.user{flex-direction:row-reverse}
+.msg-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.msg-av.ai{background:linear-gradient(135deg,#1e1b4b,#0d0c2b);border:1px solid rgba(188,140,255,.3);color:var(--purple)}
+.msg-av.user{background:var(--surface2);border:1px solid var(--border);color:var(--accent)}
+.msg-bubble{max-width:85%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6}
+.msg-bubble.ai{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:12px 12px 12px 3px}
+.msg-bubble.user{background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);color:var(--text);border-radius:12px 12px 3px 12px}
+.chat-input-wrap{padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:8px}
+.chat-input{flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;resize:none;height:42px;transition:border-color .2s}
+.chat-input:focus{border-color:var(--accent)}
+.btn-send{background:var(--accent);color:#000;border:none;border-radius:8px;padding:0 16px;font-weight:700;font-size:14px;cursor:pointer;flex-shrink:0}
+.btn-send:disabled{opacity:.4;cursor:not-allowed}
+.ai-prompts{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;overflow-y:auto}
+.ai-prompts h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px}
+.prompt-chip{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;font-size:12px;color:var(--muted);background:none;border:1px solid var(--border);cursor:pointer;font-family:var(--font);margin-bottom:6px;line-height:1.4}
+.prompt-chip:hover{color:var(--text);border-color:var(--accent);background:rgba(88,166,255,.05)}
+.ai-stats{margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.ai-stats h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border:none}
+.stat-key{font-size:11px;color:var(--muted)}
+.stat-val{font-size:12px;font-weight:600;font-family:var(--mono);color:var(--text)}
+.typing-dots{display:inline-flex;gap:3px;padding:4px 0}
+.typing-dots span{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:bounce .9s ease infinite}
+.typing-dots span:nth-child(2){animation-delay:.15s}
+.typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:10px}
+.empty-chat-icon{font-size:36px;opacity:.5}
+.mt-16{margin-top:16px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.section-gap{margin-bottom:24px}
+@media(max-width:1000px){
+  .sidebar{width:60px}
+  .sidebar-logo span,.nav-item span,.sidebar-footer .conn-badge span{display:none}
+  .main{margin-left:60px}
+  .nav-item{justify-content:center;padding:10px}
+  .charts-grid{grid-template-columns:1fr}
+  .ai-layout{grid-template-columns:1fr}
+  .ai-prompts{display:none}
+  .two-col{grid-template-columns:1fr}
+  .onboard-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
-
-<!-- LOADING -->
-<div class="loading-screen" id="loading">
-  <div class="pulse-ring"></div>
-  <p style="color:var(--muted);font-size:13px" id="loadMsg">Подключение к BambooHR…</p>
-</div>
-
-<!-- SETUP -->
+<div class="loading-screen" id="loading"><div class="pulse-ring"></div><p style="color:var(--muted);font-size:13px" id="loadMsg">Подключение к BambooHR…</p></div>
 <div class="setup" id="setup">
   <div class="setup-card">
-    <div class="setup-logo">
-      <div class="setup-logo-icon">🎋</div>
-      <div>
-        <h1>BambooHR Analytics</h1>
-        <p>HR-аналитика · AI-ассистент</p>
-      </div>
-    </div>
-    <label>Субдомен компании</label>
-    <input id="subdomain" type="text" placeholder="mercuryo">
-    <div class="hint">только название, без .bamboohr.com</div>
-    <label>API-ключ BambooHR</label>
-    <input id="apiKey" type="password" placeholder="••••••••••••••••">
-    <label>API-ключ Anthropic (для AI-чата)</label>
-    <input id="anthropicKey" type="password" placeholder="sk-ant-••••••••••••••••">
+    <div class="setup-logo"><div class="setup-logo-icon">🎋</div><div><h1>BambooHR Analytics</h1><p>HR-аналитика · AI-ассистент</p></div></div>
+    <label>Субдомен компании</label><input id="subdomain" type="text" placeholder="mercuryo"><div class="hint">только название, без .bamboohr.com</div>
+    <label>API-ключ BambooHR</label><input id="apiKey" type="password" placeholder="••••••••••••••••">
+    <label>API-ключ Anthropic (для AI-чата)</label><input id="anthropicKey" type="password" placeholder="sk-ant-••••••••••••••••">
     <div class="hint">Получить на <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent)">console.anthropic.com</a> · хранится только в браузере</div>
     <div class="error-box" id="setupError"></div>
     <button class="btn btn-primary" onclick="connect()" style="margin-top:20px">Подключиться →</button>
     <button class="btn btn-ghost" onclick="loadDemo()">Попробовать демо</button>
   </div>
 </div>
-
-<!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
   <div class="sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">🎋</div>
-      <span>BambooHR</span>
-    </div>
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">🎋</div><span>BambooHR</span></div>
     <nav class="sidebar-nav">
       <button class="nav-item active" onclick="showTab('overview',this)"><span class="nav-icon">📊</span><span>Обзор</span></button>
       <button class="nav-item" onclick="showTab('employees',this)"><span class="nav-icon">👥</span><span>Сотрудники</span></button>
@@ -247,28 +170,16 @@ tr:hover td { background: rgba(255,255,255,.02); }
       <button class="nav-item" onclick="showTab('ai',this)"><span class="nav-icon">🤖</span><span>AI-чат</span></button>
     </nav>
     <div class="sidebar-footer">
-      <div class="conn-badge">
-        <div class="conn-dot demo" id="connDot"></div>
-        <span id="connLabel">Демо-режим</span>
-      </div>
+      <div class="conn-badge"><div class="conn-dot demo" id="connDot"></div><span id="connLabel">Демо-режим</span></div>
       <button onclick="showSetup()" style="width:100%;margin-top:8px;padding:8px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:12px;font-family:var(--font)">⚙ Настройки</button>
     </div>
   </div>
-
   <div class="main">
     <div class="topbar">
-      <div>
-        <div class="topbar-title" id="topbarTitle">Обзор</div>
-        <div class="topbar-sub" id="topbarSub">Общая статистика команды</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div id="lastUpdated" style="font-size:11px;color:var(--muted);font-family:var(--mono)"></div>
-      </div>
+      <div><div class="topbar-title" id="topbarTitle">Обзор</div><div class="topbar-sub" id="topbarSub">Общая статистика команды</div></div>
+      <div id="lastUpdated" style="font-size:11px;color:var(--muted);font-family:var(--mono)"></div>
     </div>
-
     <div class="content">
-
-      <!-- OVERVIEW -->
       <div class="tab-pane active" id="tab-overview">
         <div class="kpi-grid" id="kpiGrid"></div>
         <div class="charts-grid section-gap">
@@ -278,86 +189,47 @@ tr:hover td { background: rgba(255,255,255,.02); }
           <div class="chart-card"><div class="chart-title">Активные / Неактивные</div><canvas id="chartStatus" height="200"></canvas></div>
         </div>
       </div>
-
-      <!-- ANALYTICS -->
       <div class="tab-pane" id="tab-analytics">
         <div class="kpi-grid" id="analyticsKpi"></div>
         <div class="charts-grid section-gap">
-          <div class="chart-card"><div class="chart-title">Стаж сотрудников (распределение)</div><canvas id="chartTenure" height="200"></canvas></div>
+          <div class="chart-card"><div class="chart-title">Стаж сотрудников</div><canvas id="chartTenure" height="200"></canvas></div>
           <div class="chart-card"><div class="chart-title">Рост численности (накопленный)</div><canvas id="chartHeadcount" height="200"></canvas></div>
           <div class="chart-card"><div class="chart-title">Активность по отделам</div><canvas id="chartDeptStatus" height="200"></canvas></div>
           <div class="chart-card"><div class="chart-title">Типы отпусков</div><canvas id="chartTimeoffType" height="200"></canvas></div>
         </div>
-        <div id="deptInsights" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px">
-          <div class="chart-title" style="margin-bottom:16px">Детализация по отделам</div>
-          <div id="deptTable"></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px">
+          <div class="chart-title" style="margin-bottom:16px">Детализация по отделам</div><div id="deptTable"></div>
         </div>
       </div>
-
-      <!-- EMPLOYEES -->
       <div class="tab-pane" id="tab-employees">
         <div class="search-row">
-          <div class="search-input-wrap">
-            <span class="search-icon">🔍</span>
-            <input id="searchInput" type="text" placeholder="Поиск по имени..." oninput="filterEmployees()">
-          </div>
+          <div class="search-input-wrap"><span class="search-icon">🔍</span><input id="searchInput" type="text" placeholder="Поиск по имени..." oninput="filterEmployees()"></div>
           <select id="filterDept" onchange="filterEmployees()"><option value="">Все отделы</option></select>
-          <select id="filterStatus" onchange="filterEmployees()">
-            <option value="">Все статусы</option>
-            <option value="Active">Активные</option>
-            <option value="Inactive">Неактивные</option>
-          </select>
+          <select id="filterStatus" onchange="filterEmployees()"><option value="">Все статусы</option><option value="Active">Активные</option><option value="Inactive">Неактивные</option></select>
           <select id="filterLoc" onchange="filterEmployees()"><option value="">Все локации</option></select>
         </div>
         <div class="table-wrap">
-          <div class="table-head">
-            <span class="table-head-title" id="empTitle">Сотрудники</span>
-          </div>
-          <div style="overflow-x:auto">
-            <table>
-              <thead><tr>
-                <th onclick="sortBy('firstName')">Имя ↕</th>
-                <th onclick="sortBy('department')">Отдел ↕</th>
-                <th onclick="sortBy('jobTitle')">Должность ↕</th>
-                <th>Статус</th>
-                <th onclick="sortBy('hireDate')">Дата найма ↕</th>
-                <th>Локация</th>
-              </tr></thead>
-              <tbody id="empTable"></tbody>
-            </table>
-          </div>
+          <div class="table-head"><span class="table-head-title" id="empTitle">Сотрудники</span></div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th onclick="sortBy('firstName')">Имя ↕</th><th onclick="sortBy('department')">Отдел ↕</th>
+            <th onclick="sortBy('jobTitle')">Должность ↕</th><th>Статус</th>
+            <th onclick="sortBy('hireDate')">Дата найма ↕</th><th>Локация</th>
+          </tr></thead><tbody id="empTable"></tbody></table></div>
         </div>
       </div>
-
-      <!-- TIME OFF -->
       <div class="tab-pane" id="tab-timeoff">
         <div class="kpi-grid" id="timeoffKpi"></div>
         <div class="table-wrap mt-16">
           <div class="table-head"><span class="table-head-title">Запросы на отпуск</span></div>
-          <div style="overflow-x:auto">
-            <table>
-              <thead><tr><th>Сотрудник</th><th>Тип</th><th>Начало</th><th>Конец</th><th>Дней</th><th>Статус</th></tr></thead>
-              <tbody id="timeoffTable"></tbody>
-            </table>
-          </div>
+          <div style="overflow-x:auto"><table><thead><tr><th>Сотрудник</th><th>Тип</th><th>Начало</th><th>Конец</th><th>Дней</th><th>Статус</th></tr></thead><tbody id="timeoffTable"></tbody></table></div>
         </div>
       </div>
-
-      <!-- ONBOARDING -->
       <div class="tab-pane" id="tab-onboarding">
         <div class="two-col">
-          <div>
-            <div class="section-label">Новые сотрудники (90 дней)</div>
-            <div class="onboard-grid" id="newEmployees"></div>
-          </div>
-          <div>
-            <div class="section-label" style="--accent:var(--red)">Покидают компанию</div>
-            <div class="onboard-grid" id="offEmployees"></div>
-          </div>
+          <div><div class="section-label">Новые сотрудники (90 дней)</div><div class="onboard-grid" id="newEmployees"></div></div>
+          <div><div class="section-label" style="--accent:var(--red)">Покидают компанию</div><div class="onboard-grid" id="offEmployees"></div></div>
         </div>
       </div>
-
-      <!-- SALARY -->
       <div class="tab-pane" id="tab-salary">
         <div class="kpi-grid" id="salaryKpi"></div>
         <div class="charts-grid section-gap">
@@ -368,45 +240,19 @@ tr:hover td { background: rgba(255,255,255,.02); }
         </div>
         <div class="table-wrap">
           <div class="table-head"><span class="table-head-title">Зарплаты сотрудников</span></div>
-          <div style="overflow-x:auto">
-            <table>
-              <thead><tr>
-                <th onclick="sortSalary('name')">Сотрудник ↕</th>
-                <th onclick="sortSalary('department')">Отдел ↕</th>
-                <th onclick="sortSalary('jobTitle')">Должность ↕</th>
-                <th onclick="sortSalary('payRate')">Зарплата ↕</th>
-                <th>Тип</th>
-                <th>Период</th>
-                <th onclick="sortSalary('hireDate')">Дата найма ↕</th>
-              </tr></thead>
-              <tbody id="salaryTable"></tbody>
-            </table>
-          </div>
+          <div style="overflow-x:auto"><table><thead><tr>
+            <th onclick="sortSalary('name')">Сотрудник ↕</th><th onclick="sortSalary('department')">Отдел ↕</th>
+            <th onclick="sortSalary('jobTitle')">Должность ↕</th><th onclick="sortSalary('payRate')">Зарплата ↕</th>
+            <th>Тип</th><th>Период</th><th onclick="sortSalary('hireDate')">Дата найма ↕</th>
+          </tr></thead><tbody id="salaryTable"></tbody></table></div>
         </div>
       </div>
-
-      <!-- AI CHAT -->
       <div class="tab-pane" id="tab-ai">
         <div class="ai-layout">
           <div class="chat-panel">
-            <div class="chat-header">
-              <div class="chat-header-icon">🤖</div>
-              <div class="chat-header-info">
-                <h3>HR AI-ассистент</h3>
-                <p>Powered by Claude · контекст HR-данных загружен</p>
-              </div>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-              <div class="empty-chat" id="chatEmpty">
-                <div class="empty-chat-icon">💬</div>
-                <p style="font-size:13px">Задайте вопрос об HR-данных</p>
-                <p style="font-size:11px;margin-top:4px">или выберите вопрос из списка справа</p>
-              </div>
-            </div>
-            <div class="chat-input-wrap">
-              <textarea class="chat-input" id="chatInput" placeholder="Спросите об отделах, найме, текучке…" rows="1" onkeydown="handleChatKey(event)"></textarea>
-              <button class="btn-send" id="sendBtn" onclick="sendMessage()">↑</button>
-            </div>
+            <div class="chat-header"><div class="chat-header-icon">🤖</div><div class="chat-header-info"><h3>HR AI-ассистент</h3><p>Powered by Claude · контекст HR-данных загружен</p></div></div>
+            <div class="chat-messages" id="chatMessages"><div class="empty-chat" id="chatEmpty"><div class="empty-chat-icon">💬</div><p style="font-size:13px">Задайте вопрос об HR-данных</p></div></div>
+            <div class="chat-input-wrap"><textarea class="chat-input" id="chatInput" placeholder="Спросите об отделах, найме, текучке…" rows="1" onkeydown="handleChatKey(event)"></textarea><button class="btn-send" id="sendBtn" onclick="sendMessage()">↑</button></div>
           </div>
           <div class="ai-prompts">
             <h4>Быстрые вопросы</h4>
@@ -421,20 +267,13 @@ tr:hover td { background: rgba(255,255,255,.02); }
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
-
 <script>
-const PROXY = "https://green-frost-5281.mitaxa82.workers.dev";
-let allEmployees = [], filteredEmployees = [], charts = {}, sortField = '', sortDir = 1;
-let chatHistory = [];
-let hrSummaryCache = null;
-let isDemo = true;
-let allTimeoff = [];
-
-const DEMO = [
+const PROXY="https://green-frost-5281.mitaxa82.workers.dev";
+let allEmployees=[],filteredEmployees=[],charts={},sortField='',sortDir=1,chatHistory=[],hrSummaryCache=null,isDemo=true,allTimeoff=[];
+const DEMO=[
   {firstName:"Алексей",lastName:"Иванов",department:"Разработка",jobTitle:"Senior Dev",status:"Active",hireDate:"2024-01-15",location:"Москва",payRate:"220000",payType:"Salary",paidPer:"Year"},
   {firstName:"Мария",lastName:"Петрова",department:"HR",jobTitle:"HR Manager",status:"Active",hireDate:"2020-06-01",location:"Москва",payRate:"180000",payType:"Salary",paidPer:"Year"},
   {firstName:"Дмитрий",lastName:"Сидоров",department:"Продажи",jobTitle:"Sales Lead",status:"Active",hireDate:"2022-01-10",location:"СПб",payRate:"160000",payType:"Salary",paidPer:"Year"},
@@ -460,7 +299,7 @@ const DEMO = [
   {firstName:"Борис",lastName:"Ковалев",department:"Безопасность",jobTitle:"CISO",status:"Active",hireDate:"2021-11-01",location:"Москва",payRate:"290000",payType:"Salary",paidPer:"Year"},
   {firstName:"Дарья",lastName:"Мельникова",department:"Безопасность",jobTitle:"Security Analyst",status:"Active",hireDate:"2023-07-20",location:"Москва",payRate:"190000",payType:"Salary",paidPer:"Year"},
 ];
-const DEMO_TIMEOFF = [
+const DEMO_TIMEOFF=[
   {name:"Алексей Иванов",type:"Ежегодный",start:"2025-07-01",end:"2025-07-14",status:"approved",days:14},
   {name:"Дмитрий Сидоров",type:"Больничный",start:"2025-03-05",end:"2025-03-07",status:"approved",days:3},
   {name:"Анна Козлова",type:"Ежегодный",start:"2025-08-10",end:"2025-08-20",status:"pending",days:11},
@@ -468,629 +307,228 @@ const DEMO_TIMEOFF = [
   {name:"Павел Волков",type:"Без сохранения",start:"2025-04-15",end:"2025-04-15",status:"pending",days:1},
   {name:"Никита Орлов",type:"Ежегодный",start:"2025-09-01",end:"2025-09-12",status:"pending",days:12},
 ];
+window.onload=()=>{const s=localStorage.getItem("bamboo_creds");if(s){const c=JSON.parse(s);document.getElementById("subdomain").value=c.subdomain||"";document.getElementById("apiKey").value=c.apiKey||"";document.getElementById("anthropicKey").value=c.anthropicKey||"";}};
+function show(s){document.getElementById("loading").style.display=s==="loading"?"flex":"none";document.getElementById("setup").style.display=s==="setup"?"flex":"none";document.getElementById("dashboard").style.display=s==="dashboard"?"block":"none";}
+function showSetup(){show("setup");}
+async function connect(){
+  const apiKey=document.getElementById("apiKey").value.trim();
+  const subdomain=document.getElementById("subdomain").value.trim();
+  const anthropicKey=document.getElementById("anthropicKey").value.trim();
+  if(!apiKey||!subdomain)return;
+  localStorage.setItem("bamboo_creds",JSON.stringify({apiKey,subdomain,anthropicKey}));
+  show("loading");document.getElementById("setupError").style.display="none";
+  try{
+    document.getElementById("loadMsg").textContent="Загружаем сотрудников...";
+    const empRes=await fetch(`${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=employees/directory`);
+    const empJson=await empRes.json();
+    if(empJson.error)throw new Error(empJson.error);
+    if(!empJson.employees)throw new Error("Нет данных");
+    allEmployees=empJson.employees;
 
-window.onload = () => {
-  const s = localStorage.getItem("bamboo_creds");
-  if (s) { const c = JSON.parse(s); document.getElementById("subdomain").value = c.subdomain||""; document.getElementById("apiKey").value = c.apiKey||""; document.getElementById("anthropicKey").value = c.anthropicKey||""; }
-};
+    document.getElementById("loadMsg").textContent="Загружаем даты найма...";
+    try{
+      const hdRes=await fetch(`${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom&format=JSON`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:"HireDate",filters:{lastChanged:{includeNull:"yes"}},fields:[{id:"firstName"},{id:"lastName"},{id:"hireDate"},{id:"employeeNumber"}]})});
+      const hdJson=await hdRes.json();
+      if(hdJson&&hdJson.employees)hdJson.employees.forEach(s=>{if(!s.hireDate||s.hireDate==="0000-00-00")return;const emp=allEmployees.find(e=>e.firstName===s.firstName&&e.lastName===s.lastName);if(emp)emp.hireDate=s.hireDate;});
+    }catch(e4){console.warn("HireDate fetch failed:",e4);}
 
-function show(s) {
-  document.getElementById("loading").style.display = s==="loading" ? "flex" : "none";
-  document.getElementById("setup").style.display = s==="setup" ? "flex" : "none";
-  document.getElementById("dashboard").style.display = s==="dashboard" ? "block" : "none";
+    document.getElementById("loadMsg").textContent="Загружаем зарплаты...";
+    try{
+      const salRes=await fetch(`${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom&format=JSON`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:"Salary",filters:{lastChanged:{includeNull:"yes"}},fields:[{id:"payRate"},{id:"payType"},{id:"paidPer"},{id:"paySchedule"},{id:"hireDate"},{id:"department"},{id:"jobTitle"},{id:"firstName"},{id:"lastName"},{id:"status"}]})});
+      const salJson=await salRes.json();
+      if(salJson&&salJson.employees)salJson.employees.forEach(s=>{const emp=allEmployees.find(e=>e.firstName===s.firstName&&e.lastName===s.lastName);if(emp){emp.payRate=s.payRate;emp.payType=s.payType;emp.paidPer=s.paidPer;emp.paySchedule=s.paySchedule;if(s.hireDate&&s.hireDate!=="0000-00-00")emp.hireDate=s.hireDate;}});
+    }catch(e3){console.warn("Salary fetch failed:",e3);}
+
+    document.getElementById("loadMsg").textContent="Загружаем отпуска...";
+    let realTimeoff=[];
+    try{
+      const today=new Date();
+      const start=new Date(today.getFullYear()-1,0,1).toISOString().slice(0,10);
+      const end=new Date(today.getFullYear()+1,11,31).toISOString().slice(0,10);
+      const toRes=await fetch(`${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=time_off/requests/&start=${start}&end=${end}&type=approved,requested`);
+      const toJson=await toRes.json();
+      if(Array.isArray(toJson))realTimeoff=toJson.map(r=>({name:((r.employee?.firstName||"")+" "+(r.employee?.lastName||"")).trim()||"—",type:r.type?.name||r.type||"—",start:r.start||"—",end:r.end||"—",days:r.amount?.amount?Math.round(parseFloat(r.amount.amount)):(r.days||1),status:((r.status?.status||r.status||"")).toLowerCase().includes("approved")?"approved":"pending"})).filter(r=>r.name&&r.name!=="—");
+    }catch(e2){console.warn("Timeoff failed:",e2);}
+    renderDashboard(false,realTimeoff.length>0?realTimeoff:DEMO_TIMEOFF);
+  }catch(e){show("setup");const err=document.getElementById("setupError");err.textContent="⚠️ "+e.message;err.style.display="block";}
 }
-
-function showSetup() { show("setup"); }
-
-async function connect() {
-  const apiKey = document.getElementById("apiKey").value.trim();
-  const subdomain = document.getElementById("subdomain").value.trim();
-  const anthropicKey = document.getElementById("anthropicKey").value.trim();
-  if (!apiKey || !subdomain) return;
-  localStorage.setItem("bamboo_creds", JSON.stringify({apiKey, subdomain, anthropicKey}));
-  show("loading");
-  document.getElementById("setupError").style.display = "none";
-  try {
-    document.getElementById("loadMsg").textContent = "Загружаем сотрудников...";
-    const empUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=employees/directory`;
-    const empRes = await fetch(empUrl);
-    const empJson = await empRes.json();
-    if (empJson.error) throw new Error(empJson.error);
-    if (!empJson.employees) throw new Error("Нет данных о сотрудниках");
-    allEmployees = empJson.employees;
-
-    document.getElementById("loadMsg").textContent = "Загружаем зарплаты...";
-    try {
-      const salFields = "payRate,payType,paidPer,paySchedule,department,jobTitle,firstName,lastName,status";
-      const salUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom&fields=${encodeURIComponent(salFields)}&format=JSON`;
-      const salRes = await fetch(salUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({title:"Salary Report",filters:{lastChanged:{includeNull:"yes"}},fields:[{id:"payRate"},{id:"payType"},{id:"paidPer"},{id:"paySchedule"},{id:"department"},{id:"jobTitle"},{id:"firstName"},{id:"lastName"},{id:"status"}]})});
-      const salJson = await salRes.json();
-      if (salJson && salJson.employees) {
-        salJson.employees.forEach(s => {
-          const emp = allEmployees.find(e => e.firstName === s.firstName && e.lastName === s.lastName);
-          if (emp) { emp.payRate = s.payRate; emp.payType = s.payType; emp.paidPer = s.paidPer; emp.paySchedule = s.paySchedule; }
-        });
-      }
-    } catch(e3) { console.warn("Salary fetch failed:", e3); }
-
-    document.getElementById("loadMsg").textContent = "Загружаем отпуска...";
-    let realTimeoff = [];
-    try {
-      const today = new Date();
-      const start = new Date(today.getFullYear() - 1, 0, 1).toISOString().slice(0,10);
-      const end = new Date(today.getFullYear() + 1, 11, 31).toISOString().slice(0,10);
-      const toUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=time_off/requests/&start=${start}&end=${end}&type=approved,requested`;
-      const toRes = await fetch(toUrl);
-      const toJson = await toRes.json();
-      if (Array.isArray(toJson)) {
-        realTimeoff = toJson.map(r => ({
-          name: ((r.employee && r.employee.firstName ? r.employee.firstName : "") + " " + (r.employee && r.employee.lastName ? r.employee.lastName : "")).trim() || "—",
-          type: (r.type && r.type.name) ? r.type.name : (r.type || "—"),
-          start: r.start || "—",
-          end: r.end || "—",
-          days: r.amount && r.amount.amount ? Math.round(parseFloat(r.amount.amount)) : (r.days || 1),
-          status: ((r.status && r.status.status) || r.status || "").toLowerCase().includes("approved") ? "approved" : "pending"
-        })).filter(r => r.name && r.name !== "—");
-      }
-    } catch(e2) { console.warn("Time off fetch failed:", e2); }
-
-    renderDashboard(false, realTimeoff.length > 0 ? realTimeoff : DEMO_TIMEOFF);
-  } catch(e) {
-    show("setup");
-    const err = document.getElementById("setupError");
-    err.textContent = "⚠️ " + e.message;
-    err.style.display = "block";
-  }
-}
-
-function loadDemo() { allEmployees = DEMO; renderDashboard(true, DEMO_TIMEOFF); }
-
-function renderDashboard(demo, timeoff) {
-  isDemo = demo;
-  allTimeoff = timeoff;
-  hrSummaryCache = null;
-  document.getElementById("connDot").className = "conn-dot " + (demo ? "demo" : "live");
-  document.getElementById("connLabel").textContent = demo ? "Демо-режим" : "Подключено";
-  document.getElementById("lastUpdated").textContent = "обновлено: " + new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-
-  const active = allEmployees.filter(e => (e.status||"").toLowerCase().includes("active")).length;
-  const inactive = allEmployees.length - active;
-  const deptMap = {}, locMap = {};
-  allEmployees.forEach(e => {
-    if (e.department) deptMap[e.department] = (deptMap[e.department]||0)+1;
-    if (e.location) locMap[e.location] = (locMap[e.location]||0)+1;
-  });
-  const now = new Date(), days90 = new Date(now - 90*24*60*60*1000);
-  const newCount = allEmployees.filter(e => e.hireDate && new Date(e.hireDate) >= days90).length;
-
-  // KPIs
-  const kpis = [
-    {icon:"👥", val:allEmployees.length, label:"Всего", color:"#58a6ff", trend:`+${newCount} за 90 дней`},
-    {icon:"✅", val:active, label:"Активных", color:"#3fb950", trend:`${Math.round(active/allEmployees.length*100)}% от общего`},
-    {icon:"⏸️", val:inactive, label:"Неактивных", color:"#8b949e", trend:`${Math.round(inactive/allEmployees.length*100)}% от общего`},
-    {icon:"🏢", val:Object.keys(deptMap).length, label:"Отделов", color:"#bc8cff"},
-    {icon:"📍", val:Object.keys(locMap).length, label:"Локаций", color:"#39d353"},
-    {icon:"🏖️", val:timeoff.filter(t=>t.status==="pending").length, label:"Ожидают отпуска", color:"#d29922"},
+function loadDemo(){allEmployees=DEMO;renderDashboard(true,DEMO_TIMEOFF);}
+function renderDashboard(demo,timeoff){
+  isDemo=demo;allTimeoff=timeoff;hrSummaryCache=null;
+  document.getElementById("connDot").className="conn-dot "+(demo?"demo":"live");
+  document.getElementById("connLabel").textContent=demo?"Демо-режим":"Подключено";
+  document.getElementById("lastUpdated").textContent="обновлено: "+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  const active=allEmployees.filter(e=>(e.status||"").toLowerCase().includes("active")).length;
+  const inactive=allEmployees.length-active;
+  const deptMap={},locMap={};
+  allEmployees.forEach(e=>{if(e.department)deptMap[e.department]=(deptMap[e.department]||0)+1;if(e.location)locMap[e.location]=(locMap[e.location]||0)+1;});
+  const now=new Date(),days90=new Date(now-90*24*60*60*1000);
+  const newCount=allEmployees.filter(e=>e.hireDate&&new Date(e.hireDate)>=days90).length;
+  const kpis=[
+    {icon:"👥",val:allEmployees.length,label:"Всего",color:"#58a6ff",trend:`+${newCount} за 90 дней`},
+    {icon:"✅",val:active,label:"Активных",color:"#3fb950",trend:`${Math.round(active/allEmployees.length*100)}% от общего`},
+    {icon:"⏸️",val:inactive,label:"Неактивных",color:"#8b949e",trend:`${Math.round(inactive/allEmployees.length*100)}% от общего`},
+    {icon:"🏢",val:Object.keys(deptMap).length,label:"Отделов",color:"#bc8cff"},
+    {icon:"📍",val:Object.keys(locMap).length,label:"Локаций",color:"#39d353"},
+    {icon:"🏖️",val:timeoff.filter(t=>t.status==="pending").length,label:"Ожидают отпуска",color:"#d29922"},
   ];
-  document.getElementById("kpiGrid").innerHTML = kpis.map(k=>`
-    <div class="kpi-card" style="--kpi-color:${k.color}">
-      <div class="kpi-icon">${k.icon}</div>
-      <div class="kpi-value">${k.val}</div>
-      <div class="kpi-label">${k.label}</div>
-      ${k.trend ? `<div class="kpi-trend neutral">${k.trend}</div>` : ''}
-    </div>`).join("");
-
-  // Charts
-  const palette = ["#58a6ff","#3fb950","#bc8cff","#d29922","#f85149","#39d353","#ff7b72"];
+  document.getElementById("kpiGrid").innerHTML=kpis.map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-icon">${k.icon}</div><div class="kpi-value">${k.val}</div><div class="kpi-label">${k.label}</div>${k.trend?`<div class="kpi-trend">${k.trend}</div>`:""}</div>`).join("");
+  const palette=["#58a6ff","#3fb950","#bc8cff","#d29922","#f85149","#39d353","#ff7b72"];
   mkChart("chartDept","bar",Object.keys(deptMap),Object.values(deptMap),palette);
-  const hireMap={};
-  allEmployees.forEach(e=>{const y=(e.hireDate||"").slice(0,4); if(y) hireMap[y]=(hireMap[y]||0)+1;});
+  const hireMap={};allEmployees.forEach(e=>{const y=(e.hireDate||"").slice(0,4);if(y)hireMap[y]=(hireMap[y]||0)+1;});
   const years=Object.keys(hireMap).sort();
   mkChart("chartHire","line",years,years.map(y=>hireMap[y]),"#58a6ff");
   mkChart("chartLoc","bar",Object.keys(locMap),Object.values(locMap),palette);
   mkChart("chartStatus","doughnut",["Активные","Неактивные"],[active,inactive],["#3fb950","#21262d"]);
-
-  // Filters
-  const depts = [...new Set(allEmployees.map(e=>e.department).filter(Boolean))].sort();
-  const locs = [...new Set(allEmployees.map(e=>e.location).filter(Boolean))].sort();
-  document.getElementById("filterDept").innerHTML = `<option value="">Все отделы</option>` + depts.map(d=>`<option>${d}</option>`).join("");
-  document.getElementById("filterLoc").innerHTML = `<option value="">Все локации</option>` + locs.map(l=>`<option>${l}</option>`).join("");
-
-  filteredEmployees = [...allEmployees];
-  renderEmployees();
-  renderTimeoff(timeoff);
-  renderOnboarding();
-  renderAiStats();
-  show("dashboard");
-  showTab("overview", document.querySelector(".nav-item"));
+  const depts=[...new Set(allEmployees.map(e=>e.department).filter(Boolean))].sort();
+  const locs=[...new Set(allEmployees.map(e=>e.location).filter(Boolean))].sort();
+  document.getElementById("filterDept").innerHTML=`<option value="">Все отделы</option>`+depts.map(d=>`<option>${d}</option>`).join("");
+  document.getElementById("filterLoc").innerHTML=`<option value="">Все локации</option>`+locs.map(l=>`<option>${l}</option>`).join("");
+  filteredEmployees=[...allEmployees];
+  renderEmployees();renderTimeoff(timeoff);renderOnboarding();renderAiStats();
+  show("dashboard");showTab("overview",document.querySelector(".nav-item"));
 }
-
-function mkChart(id, type, labels, data, color) {
-  if (charts[id]) charts[id].destroy();
-  const colors = Array.isArray(color) ? labels.map((_,i)=>color[i%color.length]) : [color];
-  charts[id] = new Chart(document.getElementById(id), {
-    type,
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: type==="line" ? "rgba(88,166,255,.08)" : colors.map(c=>c+(type==="bar"?"cc":"")),
-        borderColor: type==="line" ? "#58a6ff" : colors,
-        borderWidth: type==="line" ? 2 : 1,
-        pointBackgroundColor: "#58a6ff",
-        pointRadius: 4,
-        fill: type==="line",
-        borderRadius: type==="bar" ? 5 : 0,
-        tension: 0.4,
-      }]
-    },
-    options: {
-      plugins: {
-        legend: { display: type==="doughnut", labels: { color:"#8b949e", padding:16, usePointStyle:true, font:{family:"JetBrains Mono",size:11} } }
-      },
-      scales: type==="doughnut" ? {} : {
-        x: { ticks:{color:"#8b949e",font:{size:11}}, grid:{color:"rgba(33,38,45,.6)"} },
-        y: { ticks:{color:"#8b949e",font:{size:11}}, grid:{color:"rgba(33,38,45,.6)"}, beginAtZero:true }
-      }
-    }
-  });
+function mkChart(id,type,labels,data,color){
+  if(charts[id])charts[id].destroy();
+  const colors=Array.isArray(color)?labels.map((_,i)=>color[i%color.length]):[color];
+  charts[id]=new Chart(document.getElementById(id),{type,data:{labels,datasets:[{data,backgroundColor:type==="line"?"rgba(88,166,255,.08)":colors.map(c=>c+(type==="bar"?"cc":"")),borderColor:type==="line"?"#58a6ff":colors,borderWidth:type==="line"?2:1,pointBackgroundColor:"#58a6ff",pointRadius:4,fill:type==="line",borderRadius:type==="bar"?5:0,tension:0.4}]},options:{plugins:{legend:{display:type==="doughnut",labels:{color:"#8b949e",padding:16,usePointStyle:true,font:{family:"JetBrains Mono",size:11}}}},scales:type==="doughnut"?{}:{x:{ticks:{color:"#8b949e",font:{size:11}},grid:{color:"rgba(33,38,45,.6)"}},y:{ticks:{color:"#8b949e",font:{size:11}},grid:{color:"rgba(33,38,45,.6)"},beginAtZero:true}}}});
 }
-
-function filterEmployees() {
-  const q = document.getElementById("searchInput").value.toLowerCase();
-  const dept = document.getElementById("filterDept").value;
-  const status = document.getElementById("filterStatus").value;
-  const loc = document.getElementById("filterLoc").value;
-  filteredEmployees = allEmployees.filter(e => {
-    const name = `${e.firstName||""} ${e.lastName||""}`.toLowerCase();
-    return (!q || name.includes(q)) &&
-           (!dept || e.department===dept) &&
-           (!status || (e.status||"").includes(status)) &&
-           (!loc || e.location===loc);
-  });
+function filterEmployees(){
+  const q=document.getElementById("searchInput").value.toLowerCase();
+  const dept=document.getElementById("filterDept").value;
+  const status=document.getElementById("filterStatus").value;
+  const loc=document.getElementById("filterLoc").value;
+  filteredEmployees=allEmployees.filter(e=>{const name=`${e.firstName||""} ${e.lastName||""}`.toLowerCase();return(!q||name.includes(q))&&(!dept||e.department===dept)&&(!status||(e.status||"").includes(status))&&(!loc||e.location===loc);});
   renderEmployees();
 }
-
-function sortBy(field) {
-  if (sortField===field) sortDir*=-1; else { sortField=field; sortDir=1; }
-  filteredEmployees.sort((a,b)=>((a[field]||"")>(b[field]||"")?1:-1)*sortDir);
-  renderEmployees();
+function sortBy(field){if(sortField===field)sortDir*=-1;else{sortField=field;sortDir=1;}filteredEmployees.sort((a,b)=>((a[field]||"")>(b[field]||"")?1:-1)*sortDir);renderEmployees();}
+function renderEmployees(){
+  document.getElementById("empTitle").textContent=`Сотрудники (${filteredEmployees.length})`;
+  document.getElementById("empTable").innerHTML=filteredEmployees.map(e=>{const active=(e.status||"").toLowerCase().includes("active");return`<tr><td><div class="flex-row"><div class="avatar">${(e.firstName||"")[0]||""}${(e.lastName||"")[0]||""}</div>${e.firstName||""} ${e.lastName||""}</div></td><td>${e.department||"—"}</td><td style="color:var(--muted)">${e.jobTitle||"—"}</td><td><span class="pill ${active?"pill-green":"pill-gray"}">${e.status||"—"}</span></td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">${e.hireDate||"—"}</td><td>${e.location||"—"}</td></tr>`;}).join("");
 }
-
-function renderEmployees() {
-  document.getElementById("empTitle").textContent = `Сотрудники (${filteredEmployees.length})`;
-  document.getElementById("empTable").innerHTML = filteredEmployees.map(e => {
-    const active = (e.status||"").toLowerCase().includes("active");
-    return `<tr>
-      <td><div class="flex-row"><div class="avatar">${(e.firstName||"")[0]||""}${(e.lastName||"")[0]||""}</div>${e.firstName||""} ${e.lastName||""}</div></td>
-      <td>${e.department||"—"}</td>
-      <td style="color:var(--muted)">${e.jobTitle||"—"}</td>
-      <td><span class="pill ${active?"pill-green":"pill-gray"}">${e.status||"—"}</span></td>
-      <td style="font-family:var(--mono);font-size:12px;color:var(--muted)">${e.hireDate||"—"}</td>
-      <td>${e.location||"—"}</td>
-    </tr>`;
-  }).join("");
+function renderTimeoff(timeoff){
+  const kpis=[{icon:"📋",val:timeoff.length,label:"Всего запросов",color:"#58a6ff"},{icon:"⏳",val:timeoff.filter(t=>t.status==="pending").length,label:"Ожидают",color:"#d29922"},{icon:"✅",val:timeoff.filter(t=>t.status==="approved").length,label:"Одобрено",color:"#3fb950"},{icon:"📅",val:timeoff.reduce((s,t)=>s+t.days,0),label:"Всего дней",color:"#bc8cff"}];
+  document.getElementById("timeoffKpi").innerHTML=kpis.map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-icon">${k.icon}</div><div class="kpi-value">${k.val}</div><div class="kpi-label">${k.label}</div></div>`).join("");
+  document.getElementById("timeoffTable").innerHTML=timeoff.map(t=>`<tr><td>${t.name}</td><td>${t.type}</td><td style="font-family:var(--mono);font-size:12px">${t.start}</td><td style="font-family:var(--mono);font-size:12px">${t.end}</td><td style="font-family:var(--mono)">${t.days}</td><td><span class="pill ${t.status==="approved"?"pill-green":"pill-orange"}">${t.status==="approved"?"Одобрен":"Ожидает"}</span></td></tr>`).join("");
 }
-
-function renderTimeoff(timeoff) {
-  const kpis = [
-    {icon:"📋", val:timeoff.length, label:"Всего запросов", color:"#58a6ff"},
-    {icon:"⏳", val:timeoff.filter(t=>t.status==="pending").length, label:"Ожидают", color:"#d29922"},
-    {icon:"✅", val:timeoff.filter(t=>t.status==="approved").length, label:"Одобрено", color:"#3fb950"},
-    {icon:"📅", val:timeoff.reduce((s,t)=>s+t.days,0), label:"Всего дней", color:"#bc8cff"},
-  ];
-  document.getElementById("timeoffKpi").innerHTML = kpis.map(k=>`
-    <div class="kpi-card" style="--kpi-color:${k.color}">
-      <div class="kpi-icon">${k.icon}</div>
-      <div class="kpi-value">${k.val}</div>
-      <div class="kpi-label">${k.label}</div>
-    </div>`).join("");
-
-  document.getElementById("timeoffTable").innerHTML = timeoff.map(t=>`
-    <tr>
-      <td>${t.name}</td>
-      <td>${t.type}</td>
-      <td style="font-family:var(--mono);font-size:12px">${t.start}</td>
-      <td style="font-family:var(--mono);font-size:12px">${t.end}</td>
-      <td style="font-family:var(--mono)">${t.days}</td>
-      <td><span class="pill ${t.status==="approved"?"pill-green":"pill-orange"}">${t.status==="approved"?"Одобрен":"Ожидает"}</span></td>
-    </tr>`).join("");
+function renderOnboarding(){
+  const now=new Date(),days90=new Date(now-90*24*60*60*1000);
+  const newEmps=allEmployees.filter(e=>e.hireDate&&new Date(e.hireDate)>=days90);
+  const offEmps=allEmployees.filter(e=>(e.status||"").toLowerCase().includes("inactive"));
+  const card=(e,isOff)=>`<div class="onboard-card"><div class="onboard-av ${isOff?"off":""}">${(e.firstName||"")[0]||""}${(e.lastName||"")[0]||""}</div><div><div class="onboard-name">${e.firstName||""} ${e.lastName||""}</div><div class="onboard-sub">${e.jobTitle||"—"} · ${e.department||"—"}</div><div class="onboard-sub" style="margin-top:3px;font-family:var(--mono)">${e.hireDate||""}</div></div></div>`;
+  document.getElementById("newEmployees").innerHTML=newEmps.length?newEmps.map(e=>card(e,false)).join(""):`<p style="color:var(--muted);font-size:12px;grid-column:1/-1">Нет новых сотрудников за последние 90 дней</p>`;
+  document.getElementById("offEmployees").innerHTML=offEmps.length?offEmps.map(e=>card(e,true)).join(""):`<p style="color:var(--muted);font-size:12px;grid-column:1/-1">Нет неактивных сотрудников</p>`;
 }
-
-function renderOnboarding() {
-  const now = new Date(), days90 = new Date(now - 90*24*60*60*1000);
-  const newEmps = allEmployees.filter(e => e.hireDate && new Date(e.hireDate) >= days90);
-  const offEmps = allEmployees.filter(e => (e.status||"").toLowerCase().includes("inactive"));
-
-  const card = (e, isOff) => `<div class="onboard-card">
-    <div class="onboard-av ${isOff?"off":""}">${(e.firstName||"")[0]||""}${(e.lastName||"")[0]||""}</div>
-    <div>
-      <div class="onboard-name">${e.firstName||""} ${e.lastName||""}</div>
-      <div class="onboard-sub">${e.jobTitle||"—"} · ${e.department||"—"}</div>
-      <div class="onboard-sub" style="margin-top:3px;font-family:var(--mono)">${e.hireDate||""}</div>
-    </div>
-  </div>`;
-
-  document.getElementById("newEmployees").innerHTML = newEmps.length ? newEmps.map(e=>card(e,false)).join("") : `<p style="color:var(--muted);font-size:12px;grid-column:1/-1">Нет новых сотрудников за последние 90 дней</p>`;
-  document.getElementById("offEmployees").innerHTML = offEmps.length ? offEmps.map(e=>card(e,true)).join("") : `<p style="color:var(--muted);font-size:12px;grid-column:1/-1">Нет неактивных сотрудников</p>`;
+function renderAiStats(){
+  const summary=getHRSummary();
+  document.getElementById("aiStatsSidebar").innerHTML=`<h4>Данные в контексте</h4>`+[["Сотрудников",summary.total],["Активных",summary.active],["Отделов",Object.keys(summary.departments).length],["Локаций",Object.keys(summary.locations).length],["Запросы отпуска",allTimeoff.length],["Новых (90 дн.)",summary.newLast90days]].map(([k,v])=>`<div class="stat-row"><span class="stat-key">${k}</span><span class="stat-val">${v}</span></div>`).join("");
 }
-
-function renderAiStats() {
-  const summary = getHRSummary();
-  const side = document.getElementById("aiStatsSidebar");
-  side.innerHTML = `<h4>Данные в контексте</h4>` + [
-    ["Сотрудников", summary.total],
-    ["Активных", summary.active],
-    ["Отделов", Object.keys(summary.departments).length],
-    ["Локаций", Object.keys(summary.locations).length],
-    ["Запросы отпуска", allTimeoff.length],
-    ["Новых (90 дн.)", summary.newLast90days],
-  ].map(([k,v])=>`<div class="stat-row"><span class="stat-key">${k}</span><span class="stat-val">${v}</span></div>`).join("");
-}
-
-function getHRSummary() {
-  if (hrSummaryCache) return hrSummaryCache;
-  const deptMap = {}, locMap = {};
-  allEmployees.forEach(e => {
-    if (e.department) deptMap[e.department] = (deptMap[e.department]||0)+1;
-    if (e.location) locMap[e.location] = (locMap[e.location]||0)+1;
-  });
-  const active = allEmployees.filter(e => (e.status||"").toLowerCase().includes("active")).length;
-  const now = new Date(), days90 = new Date(now - 90*24*60*60*1000);
-  const newCount = allEmployees.filter(e => e.hireDate && new Date(e.hireDate) >= days90).length;
-  const hireMap = {};
-  allEmployees.forEach(e=>{const y=(e.hireDate||"").slice(0,4); if(y) hireMap[y]=(hireMap[y]||0)+1;});
-  hrSummaryCache = {total:allEmployees.length, active, inactive:allEmployees.length-active, newLast90days:newCount, departments:deptMap, locations:locMap, hireByYear:hireMap, timeoff:{total:allTimeoff.length, pending:allTimeoff.filter(t=>t.status==="pending").length, approved:allTimeoff.filter(t=>t.status==="approved").length, totalDays:allTimeoff.reduce((s,t)=>s+t.days,0)}};
+function getHRSummary(){
+  if(hrSummaryCache)return hrSummaryCache;
+  const deptMap={},locMap={};
+  allEmployees.forEach(e=>{if(e.department)deptMap[e.department]=(deptMap[e.department]||0)+1;if(e.location)locMap[e.location]=(locMap[e.location]||0)+1;});
+  const active=allEmployees.filter(e=>(e.status||"").toLowerCase().includes("active")).length;
+  const now=new Date(),days90=new Date(now-90*24*60*60*1000);
+  const newCount=allEmployees.filter(e=>e.hireDate&&new Date(e.hireDate)>=days90).length;
+  const hireMap={};allEmployees.forEach(e=>{const y=(e.hireDate||"").slice(0,4);if(y)hireMap[y]=(hireMap[y]||0)+1;});
+  hrSummaryCache={total:allEmployees.length,active,inactive:allEmployees.length-active,newLast90days:newCount,departments:deptMap,locations:locMap,hireByYear:hireMap,timeoff:{total:allTimeoff.length,pending:allTimeoff.filter(t=>t.status==="pending").length,approved:allTimeoff.filter(t=>t.status==="approved").length,totalDays:allTimeoff.reduce((s,t)=>s+t.days,0)}};
   return hrSummaryCache;
 }
-
-const TOPBAR_INFO = {
-  overview: ["Обзор", "Общая статистика команды"],
-  employees: ["Сотрудники", "Список и фильтрация"],
-  timeoff: ["Отпуска", "Управление запросами"],
-  onboarding: ["Онбординг", "Новые и уходящие сотрудники"],
-  analytics: ["Метрики", "Детальная HR-аналитика"],
-  salary: ["Зарплаты", "Анализ компенсаций и ФОТ"],
-  ai: ["AI HR-ассистент", "Задайте любой вопрос об HR-данных"],
-};
-
-function showTab(name, btn) {
-  ["overview","employees","timeoff","onboarding","analytics","salary","ai"].forEach(t => {
-    const el = document.getElementById("tab-"+t);
-    if (el) { el.classList.toggle("active", t===name); el.style.display = t===name ? "block" : "none"; }
-  });
-  document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-  const [title, sub] = TOPBAR_INFO[name] || ["", ""];
-  document.getElementById("topbarTitle").textContent = title;
-  document.getElementById("topbarSub").textContent = sub;
-  if (name === "analytics") renderAnalytics();
-  if (name === "salary") renderSalary();
+const TOPBAR_INFO={overview:["Обзор","Общая статистика команды"],employees:["Сотрудники","Список и фильтрация"],timeoff:["Отпуска","Управление запросами"],onboarding:["Онбординг","Новые и уходящие сотрудники"],analytics:["Метрики","Детальная HR-аналитика"],salary:["Зарплаты","Анализ компенсаций и ФОТ"],ai:["AI HR-ассистент","Задайте любой вопрос об HR-данных"]};
+function showTab(name,btn){
+  ["overview","employees","timeoff","onboarding","analytics","salary","ai"].forEach(t=>{const el=document.getElementById("tab-"+t);if(el){el.classList.toggle("active",t===name);el.style.display=t===name?"block":"none";}});
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  const[title,sub]=TOPBAR_INFO[name]||["",""];
+  document.getElementById("topbarTitle").textContent=title;document.getElementById("topbarSub").textContent=sub;
+  if(name==="analytics")renderAnalytics();
+  if(name==="salary")renderSalary();
 }
-
-// ─── ANALYTICS ───
-function renderAnalytics() {
-  const now = new Date();
-
-  // Tenure buckets
-  const tenure = {"< 1 года":0, "1–2 года":0, "2–5 лет":0, "5–10 лет":0, "> 10 лет":0};
-  allEmployees.forEach(e => {
-    if (!e.hireDate) return;
-    const yrs = (now - new Date(e.hireDate)) / (365.25*24*60*60*1000);
-    if (yrs < 1) tenure["< 1 года"]++;
-    else if (yrs < 2) tenure["1–2 года"]++;
-    else if (yrs < 5) tenure["2–5 лет"]++;
-    else if (yrs < 10) tenure["5–10 лет"]++;
-    else tenure["> 10 лет"]++;
-  });
-
-  // Avg tenure
-  const tenureVals = allEmployees.filter(e=>e.hireDate).map(e=>(now - new Date(e.hireDate))/(365.25*24*60*60*1000));
-  const avgTenure = tenureVals.length ? (tenureVals.reduce((a,b)=>a+b,0)/tenureVals.length).toFixed(1) : 0;
-  const retentionRate = allEmployees.length ? Math.round(allEmployees.filter(e=>(e.status||"").toLowerCase().includes("active")).length / allEmployees.length * 100) : 0;
-
-  // Headcount cumulative by year
-  const hireMap = {};
-  allEmployees.forEach(e=>{const y=(e.hireDate||"").slice(0,4); if(y) hireMap[y]=(hireMap[y]||0)+1;});
-  const years = Object.keys(hireMap).sort();
-  let cum = 0;
-  const cumData = years.map(y => { cum += hireMap[y]; return cum; });
-
-  // Dept active/inactive
-  const deptStatus = {};
-  allEmployees.forEach(e => {
-    if (!e.department) return;
-    if (!deptStatus[e.department]) deptStatus[e.department] = {active:0, inactive:0};
-    if ((e.status||"").toLowerCase().includes("active")) deptStatus[e.department].active++;
-    else deptStatus[e.department].inactive++;
-  });
-  const depts = Object.keys(deptStatus);
-
-  // Timeoff by type
-  const typeMap = {};
-  allTimeoff.forEach(t=>{ typeMap[t.type]=(typeMap[t.type]||0)+t.days; });
-
-  // Analytics KPIs
-  const days90 = new Date(now - 90*24*60*60*1000);
-  const newCount = allEmployees.filter(e=>e.hireDate && new Date(e.hireDate)>=days90).length;
-  const avgTimeoffDays = allTimeoff.length ? (allTimeoff.reduce((s,t)=>s+t.days,0)/allTimeoff.length).toFixed(1) : 0;
-
-  document.getElementById("analyticsKpi").innerHTML = [
-    {icon:"⏱️", val:`${avgTenure} лет`, label:"Средний стаж", color:"#bc8cff"},
-    {icon:"💚", val:`${retentionRate}%`, label:"Retention Rate", color:"#3fb950"},
-    {icon:"📥", val:newCount, label:"Новых за 90 дней", color:"#58a6ff"},
-    {icon:"📆", val:`${avgTimeoffDays}`, label:"Ср. дней отпуска", color:"#d29922"},
-    {icon:"🏢", val:depts.length, label:"Активных отделов", color:"#39d353"},
-    {icon:"📊", val:years[years.length-1]||"—", label:"Последний найм (год)", color:"#ff7b72"},
-  ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}">
-    <div class="kpi-icon">${k.icon}</div><div class="kpi-value">${k.val}</div><div class="kpi-label">${k.label}</div>
-  </div>`).join("");
-
-  // Charts
-  const palette = ["#58a6ff","#3fb950","#bc8cff","#d29922","#f85149","#39d353"];
+function renderAnalytics(){
+  const now=new Date();
+  const tenure={"< 1 года":0,"1–2 года":0,"2–5 лет":0,"5–10 лет":0,"> 10 лет":0};
+  allEmployees.forEach(e=>{if(!e.hireDate)return;const yrs=(now-new Date(e.hireDate))/(365.25*24*60*60*1000);if(yrs<1)tenure["< 1 года"]++;else if(yrs<2)tenure["1–2 года"]++;else if(yrs<5)tenure["2–5 лет"]++;else if(yrs<10)tenure["5–10 лет"]++;else tenure["> 10 лет"]++;});
+  const tenureVals=allEmployees.filter(e=>e.hireDate).map(e=>(now-new Date(e.hireDate))/(365.25*24*60*60*1000));
+  const avgTenure=tenureVals.length?(tenureVals.reduce((a,b)=>a+b,0)/tenureVals.length).toFixed(1):0;
+  const retentionRate=allEmployees.length?Math.round(allEmployees.filter(e=>(e.status||"").toLowerCase().includes("active")).length/allEmployees.length*100):0;
+  const hireMap={};allEmployees.forEach(e=>{const y=(e.hireDate||"").slice(0,4);if(y)hireMap[y]=(hireMap[y]||0)+1;});
+  const years=Object.keys(hireMap).sort();let cum=0;const cumData=years.map(y=>{cum+=hireMap[y];return cum;});
+  const deptStatus={};
+  allEmployees.forEach(e=>{if(!e.department)return;if(!deptStatus[e.department])deptStatus[e.department]={active:0,inactive:0};if((e.status||"").toLowerCase().includes("active"))deptStatus[e.department].active++;else deptStatus[e.department].inactive++;});
+  const depts=Object.keys(deptStatus);
+  const typeMap={};allTimeoff.forEach(t=>{typeMap[t.type]=(typeMap[t.type]||0)+t.days;});
+  const days90=new Date(now-90*24*60*60*1000);
+  const newCount=allEmployees.filter(e=>e.hireDate&&new Date(e.hireDate)>=days90).length;
+  const avgTimeoffDays=allTimeoff.length?(allTimeoff.reduce((s,t)=>s+t.days,0)/allTimeoff.length).toFixed(1):0;
+  document.getElementById("analyticsKpi").innerHTML=[{icon:"⏱️",val:`${avgTenure} лет`,label:"Средний стаж",color:"#bc8cff"},{icon:"💚",val:`${retentionRate}%`,label:"Retention Rate",color:"#3fb950"},{icon:"📥",val:newCount,label:"Новых за 90 дней",color:"#58a6ff"},{icon:"📆",val:`${avgTimeoffDays}`,label:"Ср. дней отпуска",color:"#d29922"},{icon:"🏢",val:depts.length,label:"Активных отделов",color:"#39d353"},{icon:"📊",val:years[years.length-1]||"—",label:"Последний найм (год)",color:"#ff7b72"}].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-icon">${k.icon}</div><div class="kpi-value">${k.val}</div><div class="kpi-label">${k.label}</div></div>`).join("");
+  const palette=["#58a6ff","#3fb950","#bc8cff","#d29922","#f85149","#39d353"];
   mkChart("chartTenure","bar",Object.keys(tenure),Object.values(tenure),palette);
-  mkChartLine("chartHeadcount", years, cumData);
-  mkChartStacked("chartDeptStatus", depts, depts.map(d=>deptStatus[d].active), depts.map(d=>deptStatus[d].inactive));
+  mkChartLine("chartHeadcount",years,cumData);
+  mkChartStacked("chartDeptStatus",depts,depts.map(d=>deptStatus[d].active),depts.map(d=>deptStatus[d].inactive));
   mkChart("chartTimeoffType","doughnut",Object.keys(typeMap),Object.values(typeMap),palette);
-
-  // Dept table
-  const sorted = depts.sort((a,b)=>(deptStatus[b].active+deptStatus[b].inactive)-(deptStatus[a].active+deptStatus[a].inactive));
-  document.getElementById("deptTable").innerHTML = `<table style="width:100%">
-    <thead><tr>
-      <th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-bottom:1px solid var(--border)">Отдел</th>
-      <th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-bottom:1px solid var(--border)">Всего</th>
-      <th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-bottom:1px solid var(--border)">Активных</th>
-      <th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-bottom:1px solid var(--border)">Доля</th>
-      <th style="padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--border)"></th>
-    </tr></thead>
-    <tbody>${sorted.map(d => {
-      const total = deptStatus[d].active + deptStatus[d].inactive;
-      const pct = Math.round(deptStatus[d].active / total * 100);
-      const maxTotal = deptStatus[sorted[0]].active + deptStatus[sorted[0]].inactive;
-      const barPct = Math.round(total / maxTotal * 100);
-      return `<tr>
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:600;font-size:13px">${d}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:13px">${total}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:right"><span style="color:var(--green);font-family:var(--mono);font-size:12px">${deptStatus[d].active}</span></td>
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)">${pct}%</td>
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);min-width:120px"><div style="height:6px;background:var(--border);border-radius:3px"><div style="height:6px;background:var(--accent);border-radius:3px;width:${barPct}%"></div></div></td>
-      </tr>`;
-    }).join("")}</tbody>
-  </table>`;
+  const sorted=depts.sort((a,b)=>(deptStatus[b].active+deptStatus[b].inactive)-(deptStatus[a].active+deptStatus[a].inactive));
+  document.getElementById("deptTable").innerHTML=`<table style="width:100%"><thead><tr><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:11px;background:var(--bg);border-bottom:1px solid var(--border)">Отдел</th><th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:11px;background:var(--bg);border-bottom:1px solid var(--border)">Всего</th><th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:11px;background:var(--bg);border-bottom:1px solid var(--border)">Активных</th><th style="text-align:right;padding:8px 12px;color:var(--muted);font-size:11px;background:var(--bg);border-bottom:1px solid var(--border)">Доля</th><th style="padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--border)"></th></tr></thead><tbody>${sorted.map(d=>{const total=deptStatus[d].active+deptStatus[d].inactive;const pct=Math.round(deptStatus[d].active/total*100);const maxTotal=deptStatus[sorted[0]].active+deptStatus[sorted[0]].inactive;const barPct=Math.round(total/maxTotal*100);return`<tr><td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:600;font-size:13px">${d}</td><td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono)">${total}</td><td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:right"><span style="color:var(--green);font-family:var(--mono);font-size:12px">${deptStatus[d].active}</span></td><td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)">${pct}%</td><td style="padding:10px 12px;border-bottom:1px solid var(--border);min-width:120px"><div style="height:6px;background:var(--border);border-radius:3px"><div style="height:6px;background:var(--accent);border-radius:3px;width:${barPct}%"></div></div></td></tr>`;}).join("")}</tbody></table>`;
 }
-
-function mkChartLine(id, labels, data) {
-  if (charts[id]) charts[id].destroy();
-  charts[id] = new Chart(document.getElementById(id), {
-    type: "line",
-    data: { labels, datasets: [{
-      data, label: "Численность",
-      backgroundColor: "rgba(88,166,255,.1)",
-      borderColor: "#58a6ff", borderWidth: 2.5,
-      pointBackgroundColor: "#58a6ff", pointRadius: 5, pointHoverRadius: 7,
-      fill: true, tension: 0.3
-    }]},
-    options: {
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` Всего: ${ctx.parsed.y}` } } },
-      scales: {
-        x: { ticks:{color:"#8b949e",font:{size:11}}, grid:{color:"rgba(33,38,45,.6)"} },
-        y: { ticks:{color:"#8b949e",font:{size:11}}, grid:{color:"rgba(33,38,45,.6)"}, beginAtZero:true }
-      }
-    }
-  });
-}
-
-function mkChartStacked(id, labels, activeData, inactiveData) {
-  if (charts[id]) charts[id].destroy();
-  charts[id] = new Chart(document.getElementById(id), {
-    type: "bar",
-    data: { labels, datasets: [
-      { label:"Активные", data: activeData, backgroundColor: "#3fb95099", borderColor:"#3fb950", borderWidth:1, borderRadius:4 },
-      { label:"Неактивные", data: inactiveData, backgroundColor: "#f8514933", borderColor:"#f85149", borderWidth:1, borderRadius:4 }
-    ]},
-    options: {
-      plugins: { legend: { labels:{ color:"#8b949e", usePointStyle:true, font:{size:11,family:"JetBrains Mono"} } } },
-      scales: {
-        x: { stacked:true, ticks:{color:"#8b949e",font:{size:11}}, grid:{color:"rgba(33,38,45,.6)"} },
-        y: { stacked:true, ticks:{color:"#8b949e",font:{size:11}}, grid:{color:"rgba(33,38,45,.6)"}, beginAtZero:true }
-      }
-    }
-  });
-}
-// ─── SALARY ───
-let salarySort = {field:'payRate', dir:-1};
-function sortSalary(field) {
-  if(salarySort.field===field) salarySort.dir*=-1; else {salarySort.field=field; salarySort.dir=-1;}
-  renderSalaryTable();
-}
-
-function parsePayRate(r) {
-  if(!r) return 0;
-  const n = parseFloat(String(r).replace(/[^0-9.]/g,''));
-  return isNaN(n) ? 0 : n;
-}
-
-function renderSalary() {
-  const emps = allEmployees.filter(e => (e.status||'').toLowerCase().includes('active') && parsePayRate(e.payRate) > 0);
-  if (!emps.length) {
-    document.getElementById("salaryKpi").innerHTML = `<div class="kpi-card" style="grid-column:1/-1;text-align:center;color:var(--muted)">Данные о зарплатах недоступны. Убедитесь что API-ключ имеет доступ к полям компенсации.</div>`;
-    ["chartSalaryDept","chartSalaryDist","chartSalaryFund","chartPayType"].forEach(id=>{if(charts[id])charts[id].destroy();});
-    document.getElementById("salaryTable").innerHTML = '';
-    return;
-  }
-
-  const rates = emps.map(e=>parsePayRate(e.payRate));
-  const total = rates.reduce((a,b)=>a+b,0);
-  const avg = total/rates.length;
-  const max = Math.max(...rates);
-  const min = Math.min(...rates);
-  const sorted = [...rates].sort((a,b)=>a-b);
-  const median = sorted.length%2===0 ? (sorted[sorted.length/2-1]+sorted[sorted.length/2])/2 : sorted[Math.floor(sorted.length/2)];
-
-  // KPIs
-  const fmt = n => new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(n);
-  document.getElementById("salaryKpi").innerHTML = [
-    {icon:"💰", val:`${fmt(Math.round(avg/1000))}K`, label:"Средняя зарплата", color:"#58a6ff"},
-    {icon:"📊", val:`${fmt(Math.round(median/1000))}K`, label:"Медианная", color:"#bc8cff"},
-    {icon:"🔝", val:`${fmt(Math.round(max/1000))}K`, label:"Максимум", color:"#3fb950"},
-    {icon:"🔽", val:`${fmt(Math.round(min/1000))}K`, label:"Минимум", color:"#8b949e"},
-    {icon:"🏦", val:`${fmt(Math.round(total/1000000))}M`, label:"Общий ФОТ/год", color:"#d29922"},
-    {icon:"👥", val:emps.length, label:"С данными о зарплате", color:"#39d353"},
-  ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-icon">${k.icon}</div><div class="kpi-value">${k.val}</div><div class="kpi-label">${k.label}</div></div>`).join("");
-
-  // Chart 1: avg salary by dept
-  const deptMap={};
-  emps.forEach(e=>{if(e.department){if(!deptMap[e.department])deptMap[e.department]={sum:0,cnt:0};deptMap[e.department].sum+=parsePayRate(e.payRate);deptMap[e.department].cnt++;}});
-  const depts=Object.keys(deptMap).sort((a,b)=>deptMap[b].sum/deptMap[b].cnt - deptMap[a].sum/deptMap[a].cnt);
-  const avgByDept=depts.map(d=>Math.round(deptMap[d].sum/deptMap[d].cnt));
+function mkChartLine(id,labels,data){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),{type:"line",data:{labels,datasets:[{data,label:"Численность",backgroundColor:"rgba(88,166,255,.1)",borderColor:"#58a6ff",borderWidth:2.5,pointBackgroundColor:"#58a6ff",pointRadius:5,fill:true,tension:0.3}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#8b949e",font:{size:11}},grid:{color:"rgba(33,38,45,.6)"}},y:{ticks:{color:"#8b949e",font:{size:11}},grid:{color:"rgba(33,38,45,.6)"},beginAtZero:true}}}});}
+function mkChartStacked(id,labels,activeData,inactiveData){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),{type:"bar",data:{labels,datasets:[{label:"Активные",data:activeData,backgroundColor:"#3fb95099",borderColor:"#3fb950",borderWidth:1,borderRadius:4},{label:"Неактивные",data:inactiveData,backgroundColor:"#f8514933",borderColor:"#f85149",borderWidth:1,borderRadius:4}]},options:{plugins:{legend:{labels:{color:"#8b949e",usePointStyle:true,font:{size:11,family:"JetBrains Mono"}}}},scales:{x:{stacked:true,ticks:{color:"#8b949e",font:{size:11}},grid:{color:"rgba(33,38,45,.6)"}},y:{stacked:true,ticks:{color:"#8b949e",font:{size:11}},grid:{color:"rgba(33,38,45,.6)"},beginAtZero:true}}}});}
+let salarySort={field:'payRate',dir:-1};
+function sortSalary(field){if(salarySort.field===field)salarySort.dir*=-1;else{salarySort.field=field;salarySort.dir=-1;}renderSalaryTable();}
+function parsePayRate(r){if(!r)return 0;const n=parseFloat(String(r).replace(/[^0-9.]/g,''));return isNaN(n)?0:n;}
+function renderSalary(){
+  const emps=allEmployees.filter(e=>(e.status||'').toLowerCase().includes('active')&&parsePayRate(e.payRate)>0);
+  if(!emps.length){document.getElementById("salaryKpi").innerHTML=`<div class="kpi-card" style="grid-column:1/-1;text-align:center;color:var(--muted)">Данные о зарплатах недоступны.</div>`;["chartSalaryDept","chartSalaryDist","chartSalaryFund","chartPayType"].forEach(id=>{if(charts[id])charts[id].destroy();});document.getElementById("salaryTable").innerHTML='';return;}
+  const rates=emps.map(e=>parsePayRate(e.payRate));
+  const total=rates.reduce((a,b)=>a+b,0);
+  const avg=total/rates.length;
+  const max=Math.max(...rates);
+  const min=Math.min(...rates);
+  const sorted=[...rates].sort((a,b)=>a-b);
+  const median=sorted.length%2===0?(sorted[sorted.length/2-1]+sorted[sorted.length/2])/2:sorted[Math.floor(sorted.length/2)];
+  const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(n);
+  document.getElementById("salaryKpi").innerHTML=[{icon:"💰",val:`${fmt(Math.round(avg/1000))}K`,label:"Средняя зарплата",color:"#58a6ff"},{icon:"📊",val:`${fmt(Math.round(median/1000))}K`,label:"Медианная",color:"#bc8cff"},{icon:"🔝",val:`${fmt(Math.round(max/1000))}K`,label:"Максимум",color:"#3fb950"},{icon:"🔽",val:`${fmt(Math.round(min/1000))}K`,label:"Минимум",color:"#8b949e"},{icon:"🏦",val:`${fmt(Math.round(total/1000000))}M`,label:"Общий ФОТ/год",color:"#d29922"},{icon:"👥",val:emps.length,label:"С данными о зарплате",color:"#39d353"}].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-icon">${k.icon}</div><div class="kpi-value">${k.val}</div><div class="kpi-label">${k.label}</div></div>`).join("");
+  const deptMap={};emps.forEach(e=>{if(e.department){if(!deptMap[e.department])deptMap[e.department]={sum:0,cnt:0};deptMap[e.department].sum+=parsePayRate(e.payRate);deptMap[e.department].cnt++;}});
+  const depts=Object.keys(deptMap).sort((a,b)=>deptMap[b].sum/deptMap[b].cnt-deptMap[a].sum/deptMap[a].cnt);
   const palette=["#58a6ff","#3fb950","#bc8cff","#d29922","#f85149","#39d353","#ff7b72"];
-  mkChart("chartSalaryDept","bar",depts,avgByDept,palette);
-
-  // Chart 2: distribution buckets
+  mkChart("chartSalaryDept","bar",depts,depts.map(d=>Math.round(deptMap[d].sum/deptMap[d].cnt)),palette);
   const buckets={"< 100K":0,"100–150K":0,"150–200K":0,"200–250K":0,"250–300K":0,"> 300K":0};
   rates.forEach(r=>{if(r<100000)buckets["< 100K"]++;else if(r<150000)buckets["100–150K"]++;else if(r<200000)buckets["150–200K"]++;else if(r<250000)buckets["200–250K"]++;else if(r<300000)buckets["250–300K"]++;else buckets["> 300K"]++;});
   mkChart("chartSalaryDist","bar",Object.keys(buckets),Object.values(buckets),["#58a6ff","#3fb950","#bc8cff","#d29922","#f85149","#39d353"]);
-
-  // Chart 3: total fund by dept
-  const fundByDept=depts.map(d=>Math.round(deptMap[d].sum/1000));
-  mkChart("chartSalaryFund","bar",depts,fundByDept,palette);
-
-  // Chart 4: pay types
-  const typeMap={};
-  emps.forEach(e=>{const t=e.payType||"Не указан";typeMap[t]=(typeMap[t]||0)+1;});
+  mkChart("chartSalaryFund","bar",depts,depts.map(d=>Math.round(deptMap[d].sum/1000)),palette);
+  const typeMap={};emps.forEach(e=>{const t=e.payType||"Не указан";typeMap[t]=(typeMap[t]||0)+1;});
   mkChart("chartPayType","doughnut",Object.keys(typeMap),Object.values(typeMap),palette);
-
   renderSalaryTable();
 }
-
-function renderSalaryTable() {
-  const emps = allEmployees.filter(e => parsePayRate(e.payRate) > 0);
-  const field = salarySort.field;
-  const dir = salarySort.dir;
-  const sorted = [...emps].sort((a,b)=>{
-    let av = field==='payRate' ? parsePayRate(a.payRate) : field==='name' ? (a.firstName+' '+a.lastName) : (a[field]||'');
-    let bv = field==='payRate' ? parsePayRate(b.payRate) : field==='name' ? (b.firstName+' '+b.lastName) : (b[field]||'');
-    if(typeof av==='number') return (av-bv)*dir;
-    return av>bv ? dir : av<bv ? -dir : 0;
-  });
-  const fmt = n => new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(n) + ' ₽';
-  const maxRate = Math.max(...emps.map(e=>parsePayRate(e.payRate)));
-  document.getElementById("salaryTable").innerHTML = sorted.map(e=>{
-    const rate = parsePayRate(e.payRate);
-    const pct = Math.round(rate/maxRate*100);
-    const active = (e.status||'').toLowerCase().includes('active');
-    return `<tr>
-      <td><div class="flex-row"><div class="avatar">${(e.firstName||'')[0]||''}${(e.lastName||'')[0]||''}</div>${e.firstName||''} ${e.lastName||''}</div></td>
-      <td>${e.department||'—'}</td>
-      <td style="color:var(--muted)">${e.jobTitle||'—'}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-family:var(--mono);font-weight:600;color:var(--accent);min-width:90px">${rate>0?fmt(rate):'—'}</span>
-          <div style="flex:1;height:5px;background:var(--border);border-radius:3px;min-width:60px"><div style="height:5px;background:var(--accent);border-radius:3px;width:${pct}%"></div></div>
-        </div>
-      </td>
-      <td style="font-size:12px;color:var(--muted)">${e.payType||'—'}</td>
-      <td style="font-size:12px;color:var(--muted)">${e.paidPer||'—'}</td>
-      <td style="font-family:var(--mono);font-size:12px;color:var(--muted)">${e.hireDate||'—'}</td>
-    </tr>`;
-  }).join('');
+function renderSalaryTable(){
+  const emps=allEmployees.filter(e=>parsePayRate(e.payRate)>0);
+  const field=salarySort.field;const dir=salarySort.dir;
+  const sorted=[...emps].sort((a,b)=>{let av=field==='payRate'?parsePayRate(a.payRate):field==='name'?(a.firstName+' '+a.lastName):(a[field]||'');let bv=field==='payRate'?parsePayRate(b.payRate):field==='name'?(b.firstName+' '+b.lastName):(b[field]||'');if(typeof av==='number')return(av-bv)*dir;return av>bv?dir:av<bv?-dir:0;});
+  const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(n)+' ₽';
+  const maxRate=Math.max(...emps.map(e=>parsePayRate(e.payRate)));
+  document.getElementById("salaryTable").innerHTML=sorted.map(e=>{const rate=parsePayRate(e.payRate);const pct=Math.round(rate/maxRate*100);return`<tr><td><div class="flex-row"><div class="avatar">${(e.firstName||'')[0]||''}${(e.lastName||'')[0]||''}</div>${e.firstName||''} ${e.lastName||''}</div></td><td>${e.department||'—'}</td><td style="color:var(--muted)">${e.jobTitle||'—'}</td><td><div style="display:flex;align-items:center;gap:10px"><span style="font-family:var(--mono);font-weight:600;color:var(--accent);min-width:90px">${rate>0?fmt(rate):'—'}</span><div style="flex:1;height:5px;background:var(--border);border-radius:3px;min-width:60px"><div style="height:5px;background:var(--accent);border-radius:3px;width:${pct}%"></div></div></div></td><td style="font-size:12px;color:var(--muted)">${e.payType||'—'}</td><td style="font-size:12px;color:var(--muted)">${e.paidPer||'—'}</td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">${e.hireDate||'—'}</td></tr>`;}).join('');
 }
-
-function handleChatKey(e) {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+function handleChatKey(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function getAnthropicKey(){const s=localStorage.getItem("bamboo_creds");if(s){const c=JSON.parse(s);if(c.anthropicKey)return c.anthropicKey;}return "";}
+function quickAsk(btn){const text=btn.textContent.replace(/^[^\s]+\s/,"").trim();document.getElementById("chatInput").value=text;sendMessage();}
+async function sendMessage(){
+  const input=document.getElementById("chatInput");const text=input.value.trim();if(!text)return;input.value="";
+  const anthropicKey=getAnthropicKey();
+  if(!anthropicKey){document.getElementById("chatEmpty").style.display="none";appendMsg("user",text);appendMsg("ai","⚠️ Укажите API-ключ Anthropic в настройках (⚙ внизу слева).");return;}
+  document.getElementById("chatEmpty").style.display="none";appendMsg("user",text);chatHistory.push({role:"user",content:text});
+  const sendBtn=document.getElementById("sendBtn");sendBtn.disabled=true;const typingId=appendTyping();
+  const summary=getHRSummary();
+  const systemPrompt=`Ты опытный HR-аналитик. Отвечай на русском языке. Используй конкретные цифры из данных. Будь краток но содержателен — 2-4 абзаца максимум. Вот актуальные HR-данные компании:\n${JSON.stringify(summary,null,2)}\n\nСписок сотрудников:\n${allEmployees.slice(0,30).map(e=>`${e.firstName} ${e.lastName} - ${e.department}, ${e.jobTitle}, ${e.status}, найм: ${e.hireDate}`).join("\n")}`;
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true","x-api-key":anthropicKey,"anthropic-version":"2023-06-01"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:systemPrompt,messages:chatHistory})});
+    const d=await res.json();const reply=d.content?.[0]?.text||d.error?.message||"Нет ответа";
+    removeTyping(typingId);appendMsg("ai",reply);chatHistory.push({role:"assistant",content:reply});
+    if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
+  }catch(e){removeTyping(typingId);appendMsg("ai","⚠️ Ошибка: "+e.message);}
+  sendBtn.disabled=false;
 }
-
-function getAnthropicKey() {
-  const s = localStorage.getItem("bamboo_creds");
-  if (s) { const c = JSON.parse(s); if (c.anthropicKey) return c.anthropicKey; }
-  return "";
-}
-
-function quickAsk(btn) {
-  const text = btn.textContent.replace(/^[^\s]+\s/, "").trim();
-  document.getElementById("chatInput").value = text;
-  sendMessage();
-}
-
-async function sendMessage() {
-  const input = document.getElementById("chatInput");
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = "";
-
-  const anthropicKey = getAnthropicKey();
-  if (!anthropicKey) {
-    document.getElementById("chatEmpty").style.display = "none";
-    appendMsg("user", text);
-    appendMsg("ai", "⚠️ Укажите API-ключ Anthropic в настройках (⚙ внизу слева), чтобы использовать AI-чат.");
-    return;
-  }
-
-  document.getElementById("chatEmpty").style.display = "none";
-  appendMsg("user", text);
-  chatHistory.push({role:"user", content:text});
-
-  const sendBtn = document.getElementById("sendBtn");
-  sendBtn.disabled = true;
-  const typingId = appendTyping();
-
-  const summary = getHRSummary();
-  const systemPrompt = `Ты опытный HR-аналитик. Отвечай на русском языке. Используй конкретные цифры из данных. Будь краток но содержателен — 2-4 абзаца максимум. Вот актуальные HR-данные компании:\n${JSON.stringify(summary, null, 2)}\n\nСписок сотрудников (краткий):\n${allEmployees.slice(0,30).map(e=>`${e.firstName} ${e.lastName} - ${e.department}, ${e.jobTitle}, ${e.status}, найм: ${e.hireDate}`).join("\n")}`;
-
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST",
-      headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true","x-api-key":anthropicKey,"anthropic-version":"2023-06-01"},
-      body: JSON.stringify({
-        model:"claude-sonnet-4-20250514",
-        max_tokens:1000,
-        system: systemPrompt,
-        messages: chatHistory
-      })
-    });
-    const d = await res.json();
-    const reply = d.content?.[0]?.text || d.error?.message || "Нет ответа";
-    removeTyping(typingId);
-    appendMsg("ai", reply);
-    chatHistory.push({role:"assistant", content:reply});
-    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
-  } catch(e) {
-    removeTyping(typingId);
-    appendMsg("ai", "⚠️ Ошибка подключения к AI: " + e.message);
-  }
-  sendBtn.disabled = false;
-}
-
-function appendMsg(role, text) {
-  const msgs = document.getElementById("chatMessages");
-  const div = document.createElement("div");
-  div.className = `msg ${role}`;
-  div.innerHTML = `<div class="msg-av ${role}">${role==="ai"?"🤖":"👤"}</div><div class="msg-bubble ${role}">${escapeHtml(text).replace(/\n/g,"<br>")}</div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  return div;
-}
-
-function appendTyping() {
-  const msgs = document.getElementById("chatMessages");
-  const id = "typing-" + Date.now();
-  const div = document.createElement("div");
-  div.className = "msg ai";
-  div.id = id;
-  div.innerHTML = `<div class="msg-av ai">🤖</div><div class="msg-bubble ai"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  return id;
-}
-
-function removeTyping(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
-}
-
-function escapeHtml(t) {
-  return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
+function appendMsg(role,text){const msgs=document.getElementById("chatMessages");const div=document.createElement("div");div.className=`msg ${role}`;div.innerHTML=`<div class="msg-av ${role}">${role==="ai"?"🤖":"👤"}</div><div class="msg-bubble ${role}">${escapeHtml(text).replace(/\n/g,"<br>")}</div>`;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;}
+function appendTyping(){const msgs=document.getElementById("chatMessages");const id="typing-"+Date.now();const div=document.createElement("div");div.className="msg ai";div.id=id;div.innerHTML=`<div class="msg-av ai">🤖</div><div class="msg-bubble ai"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return id;}
+function removeTyping(id){const el=document.getElementById(id);if(el)el.remove();}
+function escapeHtml(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 </script>
 </body>
 </html>
