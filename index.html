@@ -512,7 +512,7 @@ async function connect() {
     // Fetch hireDate for all employees via custom report
     document.getElementById("loadMsg").textContent = "Загружаем даты найма...";
     try {
-      const hdUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom&format=JSON`;
+      const hdUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom`;
       const hdRes = await fetch(hdUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({title:"HireDate",fields:[{id:"firstName"},{id:"lastName"},{id:"hireDate"},{id:"employeeNumber"}]})});
       const hdJson = await hdRes.json();
       if (hdJson && hdJson.employees) {
@@ -526,8 +526,7 @@ async function connect() {
 
     document.getElementById("loadMsg").textContent = "Загружаем зарплаты...";
     try {
-      const salFields = "payRate,payType,paidPer,paySchedule,hireDate,department,jobTitle,firstName,lastName,status";
-      const salUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom&fields=${encodeURIComponent(salFields)}&format=JSON`;
+      const salUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom`;
       const salRes = await fetch(salUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({title:"Salary Report",fields:[{id:"payRate"},{id:"payType"},{id:"paidPer"},{id:"paySchedule"},{id:"hireDate"},{id:"department"},{id:"jobTitle"},{id:"firstName"},{id:"lastName"},{id:"employmentHistoryStatus"}]})});
       const salJson = await salRes.json();
       if (salJson && salJson.employees) {
