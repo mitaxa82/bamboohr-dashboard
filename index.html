@@ -513,7 +513,7 @@ async function connect() {
     document.getElementById("loadMsg").textContent = "Загружаем даты найма...";
     try {
       const hdUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom`;
-      const hdRes = await fetch(hdUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({title:"HireDate",fields:[{id:"firstName"},{id:"lastName"},{id:"hireDate"},{id:"employeeNumber"}]})});
+      const hdRes = await fetch(hdUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({title:"HireDate",fields:[{id:"firstName"},{id:"lastName"},{id:"3"},{id:"employeeNumber"}]})});
       const hdJson = await hdRes.json();
       if (hdJson && hdJson.employees) {
         hdJson.employees.forEach(s => {
@@ -527,17 +527,19 @@ async function connect() {
     document.getElementById("loadMsg").textContent = "Загружаем зарплаты...";
     try {
       const salUrl = `${PROXY}?subdomain=${encodeURIComponent(subdomain)}&apiKey=${encodeURIComponent(apiKey)}&endpoint=reports/custom`;
-      const salRes = await fetch(salUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({title:"Salary Report",fields:[{id:"payRate"},{id:"payType"},{id:"paidPer"},{id:"paySchedule"},{id:"hireDate"},{id:"department"},{id:"jobTitle"},{id:"firstName"},{id:"lastName"},{id:"employmentHistoryStatus"}]})});
+      const salRes = await fetch(salUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({title:"Salary Report",fields:[{id:"19"},{id:"156"},{id:"4330"},{id:"4386"},{id:"3"},{id:"department"},{id:"jobTitle"},{id:"firstName"},{id:"lastName"},{id:"387"}]})});
       const salJson = await salRes.json();
       if (salJson && salJson.employees) {
         salJson.employees.forEach(s => {
           const emp = allEmployees.find(e => e.firstName === s.firstName && e.lastName === s.lastName);
           if (emp) {
-            emp.payRate = s.payRate;
-            emp.payType = s.payType;
-            emp.paidPer = s.paidPer;
-            emp.paySchedule = s.paySchedule;
-            if (s.hireDate && s.hireDate !== "0000-00-00") emp.hireDate = s.hireDate;
+            emp.payRate = s.payRate || s["Pay rate"] || s["19"];
+            emp.payType = s.payType || s["Pay type"] || s["156"];
+            emp.paidPer = s.paidPer || s["Paid per"] || s["4330"];
+            emp.paySchedule = s.paySchedule || s["Pay Schedule"] || s["4386"];
+            emp.status = s.status || s["Status"] || s["387"];
+            const hd = s.hireDate || s["Hire Date"] || s["3"];
+            if (hd && hd !== "0000-00-00") emp.hireDate = hd;
           }
         });
       }
